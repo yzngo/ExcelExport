@@ -58,13 +58,13 @@ namespace tablegen2.layouts
             {
                 new TableExcelHeader()
                 {
-                    FieldName = "Id",
+                    FieldName = "id",
                     FieldType = "int",
                     FieldDesc = "唯一Id索引",
                 },
                 new TableExcelHeader()
                 {
-                    FieldName = "KeyName",
+                    FieldName = "key",
                     FieldType = "string",
                     FieldDesc = "唯一Key索引",
                 },

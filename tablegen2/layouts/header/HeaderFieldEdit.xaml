@@ -26,6 +26,10 @@
             <ComboBoxItem Height="20" Content="string" Tag="string" IsSelected="True" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="int" Tag="int" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="double" Tag="double" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="bool" Tag="bool" Margin="0,1,0,1" />
+            <ComboBoxItem Height="20" Content="group" Tag="group" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="color" Tag="color" Margin="0,1,0,1"/>
+            
         </ComboBox>
         <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FieldDesc}" FontSize="10" Margin="10,20,20,20" TextWrapping="Wrap"/>
         <Grid Grid.Row="3" Grid.ColumnSpan="2" Background="#40000000">

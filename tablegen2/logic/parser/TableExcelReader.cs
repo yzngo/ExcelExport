@@ -46,13 +46,13 @@ namespace tablegen2.logic
             //加载字段
             _readHeadersFromDefSheet(sheet1, headers);
 
-            var h1 = headers.Find(a => a.FieldName == "Id");
+            var h1 = headers.Find(a => a.FieldName == "id");
             if (h1 == null)
-                throw new Exception(string.Format("'{0}'工作簿中不存在Id字段！", defSheetName));
+                throw new Exception(string.Format("'{0}'工作簿中不存在id字段！", defSheetName));
 
-            var h2 = headers.Find(a => a.FieldName == "KeyName");
+            var h2 = headers.Find(a => a.FieldName == "key");
             if (h2 == null)
-                throw new Exception(string.Format("'{0}'工作簿中不存在KeyName字段！", defSheetName));
+                throw new Exception(string.Format("'{0}'工作簿中不存在key字段！", defSheetName));
 
             //加载数据
             var headers2 = _readHeadersFromDataSheet(sheet2);

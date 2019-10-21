@@ -53,6 +53,13 @@ namespace tablegen2.logic
                                 s = n.ToString();
                             }
                             break;
+                        case "bool":
+                            {
+                                bool n = true;
+                                bool.TryParse(val, out n);
+                                s = n == true ? "true" : "false";
+                            }
+                            break;
                     }
                     appendFormatLineEx(sb, 2, "[\"{0}\"] = {1},", hdr.FieldName, s);
                 }
@@ -104,12 +111,29 @@ namespace tablegen2.logic
                                 s = n.ToString();
                             }
                             break;
+                        case "bool":
+                            {
+                                bool n = true;
+                                bool.TryParse(val, out n);
+                                s = n == true ? "true" : "false";
+                            }
+                            break;
+                        case "group":
+                            {
+                                s = string.Format("{{{0}}}", val);
+                            }
+                            break;
+                        case "color":
+                            {
+                                s = string.Format("{0:X}", val);
+                            }
+                            break;
                     }
                     sb.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
 
-                    if (hdr.FieldName == "Id")
+                    if (hdr.FieldName == "id")
                         ids.Add(s);
-                    else if (hdr.FieldName == "KeyName")
+                    else if (hdr.FieldName == "key")
                         keys.Add(s);
                 }
                 sb.AppendLine("},");

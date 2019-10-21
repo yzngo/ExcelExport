@@ -35,6 +35,15 @@ namespace tablegen2.logic
                     case 3:
                         fieldType = "string";
                         break;
+                    case 4:
+                        fieldType = "group";
+                        break;
+                    case 5:
+                        fieldType = "bool";
+                        break;
+                    case 6:
+                        fieldType = "color";
+                        break;
                     default:
                         throw new Exception(string.Format("无法识别的字段类型 fieldName:{0} fieldType:{1}", fieldName, ftype));
                 }
@@ -57,6 +66,15 @@ namespace tablegen2.logic
                             break;
                         case "double":
                             lst.Add(br.ReadDouble().ToString());
+                            break;
+                        case "group":
+                            lst.Add(br.ReadUtf8String());
+                            break;
+                        case "bool":
+                            lst.Add(br.ReadBoolean().ToString());
+                            break;
+                        case "color":
+                            lst.Add(br.ReadInt32().ToString());
                             break;
                     }
                 }

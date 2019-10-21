@@ -29,6 +29,9 @@ namespace tablegen2.logic
                     case "string":
                         ftype = 3;
                         break;
+                    case "color":
+                        ftype = 4;
+                        break;
                     default:
                         throw new Exception(string.Format("无法识别的字段类型 {0} 名称 {1}", hdr.FieldType, hdr.FieldName));
                 }

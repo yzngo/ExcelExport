@@ -30,8 +30,8 @@ namespace tablegen2.logic
 
         public bool checkUnique(out string errmsg)
         {
-            int idx1 = headers_.FindIndex(a => a.FieldName.Equals("Id"));
-            int idx2 = headers_.FindIndex(a => a.FieldName.Equals("KeyName"));
+            int idx1 = headers_.FindIndex(a => a.FieldName.Equals("id"));
+            int idx2 = headers_.FindIndex(a => a.FieldName.Equals("key"));
             var ids = new HashSet<int>();
             var keys = new HashSet<string>();
             for (int i = 0; i < rows_.Count; i++)
@@ -43,25 +43,25 @@ namespace tablegen2.logic
                 int id;
                 if (!int.TryParse(strId, out id))
                 {
-                    errmsg = string.Format("第{0}行Id值非法，须为数字类型：{1}", i + 2, strId);
+                    errmsg = string.Format("第{0}行id值非法，须为数字类型：{1}", i + 2, strId);
                     return false;
                 }
 
                 if (string.IsNullOrEmpty(strKeyName))
                 {
-                    errmsg = string.Format("第{0}行KeyName值为空", i + 2);
+                    errmsg = string.Format("第{0}行key值为空", i + 2);
                     return false;
                 }
 
                 if (ids.Contains(id))
                 {
-                    errmsg = string.Format("第{0}行Id值已存在：{1}", i + 2, strId);
+                    errmsg = string.Format("第{0}行id值已存在：{1}", i + 2, strId);
                     return false;
                 }
 
                 if (keys.Contains(strKeyName))
                 {
-                    errmsg = string.Format("第{0}行KeyName值已存在：{1}", i + 2, strKeyName);
+                    errmsg = string.Format("第{0}行key值已存在：{1}", i + 2, strKeyName);
                     return false;
                 }
 
