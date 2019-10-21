@@ -186,7 +186,7 @@ namespace tablegen2
                 }
             }
             Log.Msg("优化完毕！");
-        }
+        } 
 
         public void genSingleFile(string filePath, string exportDir, TableExportFormat fmt)
         {
@@ -220,7 +220,10 @@ namespace tablegen2
                 TableExcelData data = TableExcelReader.loadFromExcel(filePath);
                 string errmsg;
                 if (!data.checkUnique(out errmsg))
-                    Log.Wrn(errmsg);
+                    throw new System.Exception(errmsg);
+                if (!data.checkDataType(out errmsg))
+                    throw new System.Exception(errmsg);
+
                 switch (fmt)
                 {
                     case TableExportFormat.Dat:
@@ -244,6 +247,7 @@ namespace tablegen2
                     case TableExportFormat.Lua:
                         {
                             var exportPath = Path.Combine(exportDir, string.Format("{0}.lua", Path.GetFileNameWithoutExtension(filePath)));
+
                             TableExcelExportLua.exportExcelFile(data, exportPath);
                         }
                         break;

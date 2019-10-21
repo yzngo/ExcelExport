@@ -80,7 +80,6 @@ namespace tablegen2.logic
 
             var ids = new List<string>();
             var keys = new List<string>();
-
             //items
             appendFormatLineEx(sb, 0, "local items = ");
             appendFormatLineEx(sb, 0, "{{");
@@ -91,6 +90,7 @@ namespace tablegen2.logic
                 {
                     var hdr = data.Headers[i];
                     var val = row.StrList[i];
+
                     string s = string.Empty;
                     switch (hdr.FieldType)
                     {

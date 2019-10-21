@@ -72,5 +72,106 @@ namespace tablegen2.logic
             errmsg = string.Empty;
             return true;
         }
+
+        public bool checkDataType(out string errmsg)
+        {
+            var nullValue = 0;
+            var invalidValue = 0;
+            for(int i = 0; i < rows_.Count; ++i )
+            {
+                for (int j = 0; j < headers_.Count; j++)
+                {
+                    var hdr = headers_[j];
+                    var val = rows_[i].StrList[j];
+                    
+                    string s = string.Empty;
+                    if(string.IsNullOrEmpty(val) && hdr.FieldType != "group")
+                    {
+                        nullValue += 1;
+                    }
+                    else
+                    {
+                        switch (hdr.FieldType)
+                        {
+                            case "string":
+                                break;
+                            case "int":
+                                {
+                                    if (!int.TryParse(val, out _))
+                                    {
+                                        invalidValue += 1;
+                                        Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 int 型", i + 2, j + 1,  val ));
+                                    }
+                                }
+                                break;
+                            case "double":
+                                {
+                                    if (!double.TryParse(val, out _))
+                                    {
+                                        invalidValue += 1;
+                                        Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 double 型", i + 2, j + 1, val ));
+                                    }
+                                }
+                                break;
+                            case "bool":
+                                {
+                                    if (!bool.TryParse(val, out _))
+                                    {
+                                        invalidValue += 1;
+                                        Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 bool 型", i + 2, j + 1, val));
+                                    }
+                                }
+                                break;
+                            case "group":
+                                {
+                                    s = string.Format("{{{0}}}", val);
+                                }
+                                break;
+                            case "color":
+                                {
+                                    var substring = val.Substring(0, 2);
+                                    if (val.Length != 8 || string.Compare(substring, "0x") != 0)
+                                    {
+
+                                        invalidValue += 1;
+                                        Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 color 型", i + 2, j + 1, val));
+                                    }
+                                    else
+                                    {
+                                        IList<char> HexSet = new List<char>() { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f' };
+                                        for (int counter = 2; counter < val.Length; ++counter)
+                                        {
+                                            if (!HexSet.Contains<char>(val[counter]))
+                                            {
+                                                invalidValue += 1;
+                                                Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 color 型", i + 2, j + 1, val));
+                                                break;
+                                            }
+                                        }                          
+                                    }
+                                }
+                                break;
+                        }
+                    }
+
+                }
+            }
+
+            if (nullValue > 0)
+            {
+                Log.Wrn( string.Format("此表格中存在 {0} 个空值", nullValue) );
+            }
+
+            if (invalidValue > 0)
+            {
+                errmsg = string.Format("此表格中一共有 {0} 个类型错误的字段", invalidValue);
+                return false;
+            }
+            else
+            {
+                errmsg = string.Empty;
+                return true;
+            }
+        }
     }
 }

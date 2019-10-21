@@ -167,7 +167,7 @@ namespace tablegen2.layouts
                 {
                     var miExport = new MenuItem();
                     miExport.Header = menuText;
-                    miExport.Click += (_s, _e) => AppData.MainWindow.genSingleFile(item.FullPath, AppData.Config.ExcelDir, AppData.Config.ExportFormat);
+                    miExport.Click += (_s, _e) => AppData.MainWindow.genSingleFile(item.FullPath, AppData.Config.ExportDir, AppData.Config.ExportFormat);
                     menu.Items.Add(miExport);
                 }
             }
