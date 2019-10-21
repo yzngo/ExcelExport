@@ -14,15 +14,15 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Background="#80000000">
             <TextBlock Text="使用说明" Foreground="White"
-                       FontSize="16" FontWeight="Bold"
+                       FontSize="22" FontWeight="Bold"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
-        <Grid Grid.Row="1" Background="#60000000">
+        <Grid Grid.Row="1" Background="#20000000">
             <ScrollViewer x:Name="sv" Margin="5"
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
                 <StackPanel Grid.Row="1" Orientation="Vertical">
-                    <TextBlock x:Name="txt" TextWrapping="Wrap" FontSize="12" Foreground="Yellow" 
+                    <TextBlock x:Name="txt" TextWrapping="Wrap" FontSize="14" Foreground="Black" 
                                FontWeight="Bold" Text="" />
                 </StackPanel>
             </ScrollViewer>

@@ -39,6 +39,10 @@ namespace tablegen2
             }
         }
 
+        private void btnClear_Clicked(object sender, RoutedEventArgs e)
+        {
+            clearLog();
+        }
         private void btnHelp_Clicked(object sender, RoutedEventArgs e)
         {
             _flipHelpPanel();
@@ -87,6 +91,11 @@ namespace tablegen2
         {
             if (console != null)
                 console.addMessage(msg, color);
+        }
+
+       public void clearLog()
+        {
+            console.clearMessage();
         }
 
         public void refreshButtonGenAll()
@@ -252,7 +261,7 @@ namespace tablegen2
                         }
                         break;
                 }
-                Log.Msg("生成成功");
+                Log.Msg("=============生成成功====================================");
             }
             catch (System.Exception ex)
             {
