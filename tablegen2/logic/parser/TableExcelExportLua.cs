@@ -80,7 +80,21 @@ namespace tablegen2.logic
 
             var ids = new List<string>();
             var keys = new List<string>();
-            //items
+
+            //comment   ----------------------------------------------------------------------------------
+            appendFormatLineEx(sb, 0, "--[[ table define:");
+            appendFormatLineEx(sb, 1, "{0,-15} {1,-10} {2}", "name", "type", "desc");
+            sb.AppendLine();
+            //foreach
+            for (int i = 0; i < data.Headers.Count; i++)
+            {
+                var hdr = data.Headers[i];
+                appendFormatLineEx(sb, 1, "{0,-15} {1,-10} {2}", hdr.FieldName, hdr.FieldType, hdr.FieldDesc);
+            }
+            appendFormatLineEx(sb, 0, "--]]");
+            sb.AppendLine();
+
+            //items     ----------------------------------------------------------------------------------
             appendFormatLineEx(sb, 0, "local items = ");
             appendFormatLineEx(sb, 0, "{{");
             foreach (var row in data.Rows)
@@ -141,7 +155,7 @@ namespace tablegen2.logic
             appendFormatLineEx(sb, 0, "}}");
             sb.AppendLine();
 
-            //idItems
+            //idItems   ----------------------------------------------------------------------------------
             appendFormatLineEx(sb, 0, "local idItems = ");
             appendFormatLineEx(sb, 0, "{{");
             for (int i = 0; i < ids.Count; i++)
@@ -151,7 +165,7 @@ namespace tablegen2.logic
             appendFormatLineEx(sb, 0, "}}");
             sb.AppendLine();
 
-            //keyItems
+            //keyItems  ----------------------------------------------------------------------------------
             appendFormatLineEx(sb, 0, "local keyItems = ");
             appendFormatLineEx(sb, 0, "{{");
             for (int i = 0; i < keys.Count; i++)
