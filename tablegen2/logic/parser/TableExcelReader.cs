@@ -106,6 +106,7 @@ namespace tablegen2.logic
                 var str1 = _convertCellToString(rd.GetCell(0));
                 var str2 = _convertCellToString(rd.GetCell(1));
                 var str3 = _convertCellToString(rd.GetCell(2));
+                var str4 = _convertCellToString(rd.GetCell(3));
 
                 if (string.IsNullOrEmpty(str1) && string.IsNullOrEmpty(str2) && string.IsNullOrEmpty(str3))
                     continue;
@@ -117,6 +118,7 @@ namespace tablegen2.logic
                         FieldName = str1,
                         FieldType = str2,
                         FieldDesc = str3,
+                        FieldDetail = str4,
                     });
                     continue;
                 }
