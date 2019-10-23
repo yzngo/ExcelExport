@@ -44,6 +44,9 @@ namespace tablegen2.logic
                     case 6:
                         fieldType = "color";
                         break;
+                    case 7:
+                        fieldType = "table";
+                        break;
                     default:
                         throw new Exception(string.Format("无法识别的字段类型 fieldName:{0} fieldType:{1}", fieldName, ftype));
                 }
@@ -75,6 +78,9 @@ namespace tablegen2.logic
                             break;
                         case "color":
                             lst.Add(br.ReadInt32().ToString());
+                            break;
+                        case "table":
+                            lst.Add(br.ReadUtf8String());
                             break;
                     }
                 }

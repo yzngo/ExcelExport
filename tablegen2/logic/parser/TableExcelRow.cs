@@ -9,10 +9,10 @@ namespace tablegen2.logic
     public class TableExcelRow
     {
         public List<string> StrList { get; set; }
-
         public TableExcelRow()
         {
             StrList = new List<string>();
         }
+        
     }
 }

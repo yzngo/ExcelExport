@@ -9,7 +9,7 @@ namespace tablegen2.logic
     {
         public static void exportExcelFile(TableExcelData data, string filePath)
         {
-            exportLua_Impl2(data, filePath);
+            exportLua_Impl(data, filePath);
         }
 
         public static void appendFormatLineEx(StringBuilder sb, int indent, string fmtstr, params object[] args)
@@ -20,113 +20,60 @@ namespace tablegen2.logic
             sb.AppendLine();
         }
 
-        #region export for simple format
-        private static void exportLua_Impl1(TableExcelData data, string filePath)
+        private static string BuildCommentString( List<TableExcelHeader> headers )
         {
-            var sb = new StringBuilder();
-            appendFormatLineEx(sb, 0, "local data = ");
-            appendFormatLineEx(sb, 0, "{{");
-            foreach (var row in data.Rows)
+            var luaString = new StringBuilder();
+            appendFormatLineEx(luaString, 0, "--[[ table define:");
+            appendFormatLineEx(luaString, 1, "{0,-30} {1,-10} {2}", "name", "type", "desc");
+            luaString.AppendLine();
+
+            for (int i = 0; i < headers.Count; i++)
             {
-                appendFormatLineEx(sb, 1, "{{");
-                for (int i = 0; i < data.Headers.Count; i++)
-                {
-                    var hdr = data.Headers[i];
-                    var val = row.StrList[i];
-                    string s = string.Empty;
-                    switch (hdr.FieldType)
-                    {
-                        case "string":
-                            s = string.Format("\"{0}\"", val);
-                            break;
-                        case "int":
-                            {
-                                int n = 0;
-                                int.TryParse(val, out n);
-                                s = n.ToString();
-                            }
-                            break;
-                        case "double":
-                            {
-                                double n = 0;
-                                double.TryParse(val, out n);
-                                s = n.ToString();
-                            }
-                            break;
-                        case "bool":
-                            {
-                                bool n = true;
-                                bool.TryParse(val, out n);
-                                s = n == true ? "true" : "false";
-                            }
-                            break;
-                    }
-                    appendFormatLineEx(sb, 2, "[\"{0}\"] = {1},", hdr.FieldName, s);
-                }
-                appendFormatLineEx(sb, 1, "}},");
+                var hdr = headers[i];
+                appendFormatLineEx(luaString, 1, "{0,-30} {1,-10} {2}", hdr.FieldName, hdr.FieldType, hdr.FieldDesc);
             }
-            appendFormatLineEx(sb, 0, "}}");
-            sb.AppendLine();
-            appendFormatLineEx(sb, 0, "return data");
+            appendFormatLineEx(luaString, 0, "--]]");
+            luaString.AppendLine();
+            luaString.AppendLine();
 
-            File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(sb.ToString()));
-        }
-        #endregion
-
-        #region export for utility format
-        private static void exportLua_Impl2(TableExcelData data, string filePath)
-        {
-            var sb = new StringBuilder();
-
-            var ids = new List<string>();
-            var keys = new List<string>();
-
-            //comment       ----------------------------------------------------------------------------------
-            appendFormatLineEx(sb, 0, "--[[ table define:");
-            appendFormatLineEx(sb, 1, "{0,-30} {1,-10} {2}", "name", "type", "desc");
-            sb.AppendLine();
-
-            for (int i = 0; i < data.Headers.Count; i++)
-            {
-                var hdr = data.Headers[i];
-                appendFormatLineEx(sb, 1, "{0,-30} {1,-10} {2}", hdr.FieldName, hdr.FieldType, hdr.FieldDesc);
-            }
-            appendFormatLineEx(sb, 0, "--]]");
-            sb.AppendLine();
-            sb.AppendLine();
-
-            //comment tips  ----------------------------------------------------------------------------------
             var tipsNum = 0;
-            
-            for (int i = 0; i < data.Headers.Count; i++)
+
+            for (int i = 0; i < headers.Count; i++)
             {
-                var hdr = data.Headers[i];
+                var hdr = headers[i];
                 if (hdr.FieldDetail.Length > 0)
                 {
-                    if(tipsNum == 0)
+                    if (tipsNum == 0)
                     {
-                        appendFormatLineEx(sb, 0, "--[[ table tips:");
-                        sb.AppendLine();
+                        appendFormatLineEx(luaString, 0, "--[[ table tips:");
+                        luaString.AppendLine();
                     }
                     tipsNum++;
-                    appendFormatLineEx(sb, 0, "{0}", hdr.FieldName);
-                    appendFormatLineEx(sb, 0, "{0,-10}", hdr.FieldDetail);
-                    sb.AppendLine();
+                    appendFormatLineEx(luaString, 0, "{0}", hdr.FieldName);
+                    appendFormatLineEx(luaString, 0, "{0,-10}", hdr.FieldDetail);
+                    luaString.AppendLine();
                 }
             }
-            if(tipsNum > 0)
+            if (tipsNum > 0)
             {
-                appendFormatLineEx(sb, 0, "--]]");
-                sb.AppendLine();
-                sb.AppendLine();
+                appendFormatLineEx(luaString, 0, "--]]");
+                luaString.AppendLine();
+                luaString.AppendLine();
             }
+            return luaString.ToString();
+        }
 
-            //items         ----------------------------------------------------------------------------------
-            appendFormatLineEx(sb, 0, "local items = ");
-            appendFormatLineEx(sb, 0, "{{");
+        private static string BuildDataString(TableExcelData data, string key)
+        {
+            var luaString = new StringBuilder();
+            int item = 0;
             foreach (var row in data.Rows)
             {
-                sb.Append("    { ");
+
+
+                if (key != string.Empty && key != row.StrList[1])
+                    continue;
+                luaString.Append("{ ");
                 for (int i = 0; i < data.Headers.Count; i++)
                 {
                     var hdr = data.Headers[i];
@@ -169,53 +116,95 @@ namespace tablegen2.logic
                                 s = string.Format("{0:X}", val);
                             }
                             break;
+                        case "table":
+                            {
+                                s = BuildDataString(data.ChildData[hdr.FieldName], row.StrList[1]);
+                            }
+                            break;
                     }
-                    sb.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
-
-                    if (hdr.FieldName == "id")
-                        ids.Add(s);
-                    else if (hdr.FieldName == "key")
-                        keys.Add(s);
+                    luaString.AppendFormat("{0} = {1},", hdr.FieldName, s);
                 }
-                sb.AppendLine("},");
+                luaString.AppendLine("}");
+
             }
-            appendFormatLineEx(sb, 0, "}}");
-            sb.AppendLine();
+            return luaString.ToString();
+        }
 
-            //idItems       ----------------------------------------------------------------------------------
-            appendFormatLineEx(sb, 0, "local idItems = ");
-            appendFormatLineEx(sb, 0, "{{");
-            for (int i = 0; i < ids.Count; i++)
-            {
-                appendFormatLineEx(sb, 1, "[{0}] = items[{1}],", ids[i], i + 1);
-            }
-            appendFormatLineEx(sb, 0, "}}");
-            sb.AppendLine();
+        #region export lua table
+        private static void exportLua_Impl(TableExcelData data, string filePath)
+        {
+            var luaString = new StringBuilder();
+            luaString.Append(BuildCommentString(data.Headers));
 
-            //keyItems      ----------------------------------------------------------------------------------
-            appendFormatLineEx(sb, 0, "local keyItems = ");
-            appendFormatLineEx(sb, 0, "{{");
-            for (int i = 0; i < keys.Count; i++)
-            {
-                appendFormatLineEx(sb, 1, "[{0}] = items[{1}],", keys[i], i + 1);
-            }
-            appendFormatLineEx(sb, 0, "}}");
-            sb.AppendLine();
+            appendFormatLineEx(luaString, 0, "local items = ");
+            appendFormatLineEx(luaString, 0, "{{");
 
-            sb.Append( BuildFunction(Path.GetFileName(filePath))) ;
+            luaString.Append(BuildDataString(data, string.Empty));
 
-            File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(sb.ToString()));
+            
+            appendFormatLineEx(luaString, 0, "}}");
+            luaString.AppendLine();
+            luaString.Append(BuildItemString(data));
+            luaString.Append( BuildFuncString(Path.GetFileName(filePath))) ;
+            File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(luaString.ToString()));
         }
         #endregion
-
-        private static string BuildFunction( string fileName )
+        private static string BuildItemString(TableExcelData data)
         {
-            var sb = new StringBuilder();
-            sb.Append(
+            var ids = new List<string>();
+            var keys = new List<string>();
+            var luaString = new StringBuilder();
+            foreach (var row in data.Rows)
+            {
+                for (int i = 0; i < data.Headers.Count; i++)
+                {
+                    var hdr = data.Headers[i];
+                    var val = row.StrList[i];
+                    string s = string.Empty;
+                    if (hdr.FieldName == "id")
+                    {
+                        int n = 0;
+                        int.TryParse(val, out n);
+                        s = n.ToString();
+                        ids.Add(s);
+                    }
+                    else if (hdr.FieldName == "key")
+                    {
+                        s = string.Format("\"{0}\"", val);
+                        keys.Add(s);
+                    }
+
+                }
+            }
+
+            appendFormatLineEx(luaString, 0, "local idItems = ");
+            appendFormatLineEx(luaString, 0, "{{");
+            for (int i = 0; i < ids.Count; i++)
+            {
+                appendFormatLineEx(luaString, 1, "[{0}] = items[{1}],", ids[i], i + 1);
+            }
+            appendFormatLineEx(luaString, 0, "}}");
+            luaString.AppendLine();
+
+            appendFormatLineEx(luaString, 0, "local keyItems = ");
+            appendFormatLineEx(luaString, 0, "{{");
+            for (int i = 0; i < keys.Count; i++)
+            {
+                appendFormatLineEx(luaString, 1, "[{0}] = items[{1}],", keys[i], i + 1);
+            }
+            appendFormatLineEx(luaString, 0, "}}");
+            luaString.AppendLine();
+            return luaString.ToString();
+        }
+
+        private static string BuildFuncString( string fileName )
+        {
+            var luaString = new StringBuilder();
+            luaString.Append(
 @"
 local data = { Items = items, IdItems = idItems, KeyItems = keyItems, }
 ");
-            sb.AppendFormat(
+            luaString.AppendFormat(
 @"
 function data:GetById( id, prop )
     local item = self.IdItems[id];
@@ -255,7 +244,7 @@ end
 
 return data
 ", Path.GetFileName(fileName));
-            return sb.ToString();
+            return luaString.ToString();
         }
     }
 }

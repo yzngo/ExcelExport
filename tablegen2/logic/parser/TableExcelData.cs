@@ -5,41 +5,31 @@ namespace tablegen2.logic
 {
     public class TableExcelData
     {
-        private List<TableExcelHeader> headers_ = new List<TableExcelHeader>();
-        private List<TableExcelRow> rows_ = new List<TableExcelRow>();
-
         public TableExcelData()
         {
         }
 
         public TableExcelData(IEnumerable<TableExcelHeader> headers, IEnumerable<TableExcelRow> rows)
         {
-            headers_ = headers.ToList();
-            rows_ = rows.ToList();
+            Headers = headers.ToList();
+            Rows = rows.ToList();
         }
 
-        public List<TableExcelHeader> Headers
-        {
-            get { return headers_; }
-        }
-
-        public List<TableExcelRow> Rows
-        {
-            get { return rows_; }
-        }
+        public List<TableExcelHeader> Headers { get; } = new List<TableExcelHeader>();
+        public List<TableExcelRow> Rows { get; } = new List<TableExcelRow>();
+        public Dictionary<string, TableExcelData> ChildData { get; set; } = new Dictionary<string, TableExcelData>();
 
         public bool checkUnique(out string errmsg)
         {
-            int idx1 = headers_.FindIndex(a => a.FieldName.Equals("id"));
-            int idx2 = headers_.FindIndex(a => a.FieldName.Equals("key"));
+            int idx1 = Headers.FindIndex(a => a.FieldName.Equals("id"));
+            int idx2 = Headers.FindIndex(a => a.FieldName.Equals("key"));
             var ids = new HashSet<int>();
             var keys = new HashSet<string>();
-            for (int i = 0; i < rows_.Count; i++)
+            for (int i = 0; i < Rows.Count; i++)
             {
-                var row = rows_[i];
+                var row = Rows[i];
                 var strId = row.StrList[idx1];
                 var strKeyName = row.StrList[idx2];
-
                 int id;
                 if (!int.TryParse(strId, out id))
                 {
@@ -68,6 +58,18 @@ namespace tablegen2.logic
                 ids.Add(id);
                 keys.Add(strKeyName);
             }
+            //for (int i = 0; i < Headers.Count; i++)
+            //{
+            //    var hdr = Headers[i];
+            //    if( hdr.FieldType == "table" )
+            //    {
+            //        ChildData[i].checkUnique(out errmsg);
+            //        if(errmsg != string.Empty)
+            //        {
+            //            return false;
+            //        }
+            //    } 
+            //}
 
             errmsg = string.Empty;
             return true;
@@ -77,10 +79,10 @@ namespace tablegen2.logic
         {
             var nullValue = 0;
             var invalidValue = 0;
-            for(int i = 0; i < headers_.Count; ++i)
+            for(int i = 0; i < Headers.Count; ++i)
             {
-                var hdr = headers_[i];
-                IList<string> field = new List<string>() { "string","int", "double", "bool", "color", "group" };
+                var hdr = Headers[i];
+                IList<string> field = new List<string>() { "string","int", "double", "bool", "color", "group", "table", };
                 if (!field.Contains<string>(hdr.FieldType))
                 {
                     invalidValue++;
@@ -88,14 +90,13 @@ namespace tablegen2.logic
                 }
             }
 
-            for(int i = 0; i < rows_.Count; ++i)
+            for(int i = 0; i < Rows.Count; ++i)
             {
-                for (int j = 0; j < headers_.Count; ++j)
+                for (int j = 0; j < Headers.Count; ++j)
                 {
-                    var hdr = headers_[j];
-                    var val = rows_[i].StrList[j];
+                    var hdr = Headers[j];
+                    var val = Rows[i].StrList[j];
                     
-                    string s = string.Empty;
                     if(string.IsNullOrEmpty(val) && hdr.FieldType != "group")
                     {
                         nullValue++;
@@ -131,11 +132,6 @@ namespace tablegen2.logic
                                         invalidValue++;
                                         Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 bool 型", i + 2, j + 1, val));
                                     }
-                                }
-                                break;
-                            case "group":
-                                {
-                                    s = string.Format("{{{0}}}", val);
                                 }
                                 break;
                             case "color":

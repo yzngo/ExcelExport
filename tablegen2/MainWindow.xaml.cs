@@ -244,7 +244,6 @@ namespace tablegen2
                     throw new System.Exception(errmsg);
                 if (!data.checkDataType(out errmsg))
                     throw new System.Exception(errmsg);
-                
                 switch (fmt)
                 {
                     case TableExportFormat.Dat:

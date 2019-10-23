@@ -18,22 +18,18 @@ namespace tablegen2.logic
             if (ext != ".xls" && ext != ".xlsx")
                 throw new Exception(string.Format("无法识别的文件扩展名 {0}", ext));
 
-            var headers = new List<TableExcelHeader>();
-            var rows = new List<TableExcelRow>();
-            
             var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             var workbook = ext == ".xls" ? (IWorkbook)new HSSFWorkbook(fs) : (IWorkbook)new XSSFWorkbook(fs);
             fs.Close();
 
-            _readDataFromWorkbook(workbook, headers, rows);
-
-            return new TableExcelData(headers, rows);
+            var def = AppData.Config.SheetNameForField;
+            var data = AppData.Config.SheetNameForData;
+            return _readDataFromWorkbook(workbook, def, 1, 0, data );
         }
 
-        private static void _readDataFromWorkbook(IWorkbook wb, List<TableExcelHeader> headers, List<TableExcelRow> rows)
+        private static TableExcelData _readDataFromWorkbook(IWorkbook wb, string defSheetName, int row, int column, string dataSheetName )
         {
-            var defSheetName = AppData.Config.SheetNameForField;
-            var dataSheetName = AppData.Config.SheetNameForData;
+            var rows = new List<TableExcelRow>();
 
             var sheet1 = wb.GetSheet(defSheetName);
             if (sheet1 == null)
@@ -44,8 +40,7 @@ namespace tablegen2.logic
                 throw new Exception(string.Format("'{0}'工作簿不存在", dataSheetName));
 
             //加载字段
-            _readHeadersFromDefSheet(sheet1, headers);
-
+           var headers = _readHeadersFromDefSheet(sheet1, row, column);
             var h1 = headers.Find(a => a.FieldName == "id");
             if (h1 == null)
                 throw new Exception(string.Format("'{0}'工作簿中不存在id字段！", defSheetName));
@@ -57,6 +52,7 @@ namespace tablegen2.logic
             //加载数据
             var headers2 = _readHeadersFromDataSheet(sheet2);
             var headerIndexes = new int[headers.Count];
+
             _checkFieldsSame(headers, headers2, headerIndexes);
 
             foreach (var ds in _readDataFromDataSheet(sheet2, headers2.Count))
@@ -69,10 +65,38 @@ namespace tablegen2.logic
                 }
                 rows.Add(new TableExcelRow() { StrList = rowData });
             }
+
+            var data = new TableExcelData(headers, rows);
+
+            for (int r = row; r <= sheet1.LastRowNum; r++)
+            {
+                var rd = sheet1.GetRow(r);
+                if (rd == null)
+                    continue;
+                var str1 = _convertCellToString(rd.GetCell(column + 0));
+                var str2 = _convertCellToString(rd.GetCell(column + 1));
+                if (string.IsNullOrEmpty(str2))
+                    continue;
+                else
+                {
+                    var cell = rd.GetCell(column + 1);
+                    if (cell.Hyperlink != null && cell.Hyperlink.Type == HyperlinkType.Document)
+                    {
+                        string s = cell.Hyperlink.Address;
+                        char[] addr = s.ToCharArray();
+
+                        int x = addr[5] - '0';
+                        int y = addr[4] - 'A';
+                        data.ChildData.Add(str1, _readDataFromWorkbook(wb, defSheetName, x, y, str1));
+                    }
+                }
+            }  
+            return data;
         }
 
         private static string _convertCellToString(ICell cell)
         {
+            
             string r = string.Empty;
             if (cell != null)
             {
@@ -95,23 +119,24 @@ namespace tablegen2.logic
             return r;
         }
 
-        private static void _readHeadersFromDefSheet(ISheet sheet, List<TableExcelHeader> headers)
+        private static List<TableExcelHeader> _readHeadersFromDefSheet( ISheet sheet, int row, int column )
         {
-            for (int row = 1; row <= sheet.LastRowNum; row++)
+            
+            var headers = new List<TableExcelHeader>();
+            for (int r = row; r <= sheet.LastRowNum; r++)
             {
-                var rd = sheet.GetRow(row);
+                var rd = sheet.GetRow(r);
                 if (rd == null)
                     continue;
-
-                var str1 = _convertCellToString(rd.GetCell(0));
-                var str2 = _convertCellToString(rd.GetCell(1));
-                var str3 = _convertCellToString(rd.GetCell(2));
-                var str4 = _convertCellToString(rd.GetCell(3));
-
-                if (string.IsNullOrEmpty(str1) && string.IsNullOrEmpty(str2) && string.IsNullOrEmpty(str3))
+                var str1 = _convertCellToString(rd.GetCell(column + 0));
+                var str2 = _convertCellToString(rd.GetCell(column + 1));
+                var str3 = _convertCellToString(rd.GetCell(column + 2));
+                var str4 = _convertCellToString(rd.GetCell(column + 3));
+                
+                if (string.IsNullOrEmpty(str1) && string.IsNullOrEmpty(str2) && string.IsNullOrEmpty(str3) )
                     continue;
 
-                if (!string.IsNullOrEmpty(str1) && !string.IsNullOrEmpty(str2))
+                if (!string.IsNullOrEmpty(str1 ) && !string.IsNullOrEmpty(str2))
                 {
                     headers.Add(new TableExcelHeader()
                     {
@@ -124,8 +149,9 @@ namespace tablegen2.logic
                 }
 
                 throw new Exception(string.Format(
-                    "'{0}'工作簿中第{1}行数据异常，有缺失！", AppData.Config.SheetNameForField, row + 1));
+                    "'{0}'工作簿中第{1}行数据异常，有缺失！", sheet, r + 1));
             }
+            return headers;
         }
         
         private static List<string> _readHeadersFromDataSheet(ISheet sheet)

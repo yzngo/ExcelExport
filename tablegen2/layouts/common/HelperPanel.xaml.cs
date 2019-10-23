@@ -17,7 +17,8 @@ namespace tablegen2.layouts
         double (小数)            
         bool (布尔型)            
         color (格式 0xFFFFFF)    
-        group (table型)          
+        group (数组类型)
+        table (子表类型) 
 
   * 单元格留空时的导出行为定义
         string留空 导出为""""     
@@ -26,6 +27,7 @@ namespace tablegen2.layouts
         bool留空 不导出此字段   
         color留空 不导出此字段
         group留空 导出为{} 
+        table留空 不导出此字段
 
   * 每张表须包含两个字段名称固定且值不能重复的字段
         id（全局唯一数字索引）
