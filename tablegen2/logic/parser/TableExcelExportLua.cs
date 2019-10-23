@@ -218,35 +218,35 @@ local data = { Items = items, IdItems = idItems, KeyItems = keyItems, }
             sb.AppendFormat(
 @"
 function data:GetById( id, prop )
-    local dat = self.IdItems[id];
-    if dat == nil then
-        sGlobal:Print( ""{0} GetById error, invalid id: ""..id );
+    local item = self.IdItems[id];
+    if item == nil then
+        sGlobal:Print( ""{0} GetById nil item: ""..id );
         return id;
     end
     if prop == nil then
-        return dat;
+        return item;
     end
-    if dat[prop] == nil then
-        sGlobal:Print( ""{0} GetById error, invalid prop: ""..prop );
-        return dat;
+    if item[prop] == nil then
+        sGlobal:Print( ""{0} GetById nil prop: ""..prop );
+        return item;
     end
-    return dat[prop];
+    return item[prop];
 end
 
 function data:GetByKey( key, prop )
-    local dat = self.KeyItems[key];
-    if dat == nil then
-        sGlobal:Print( ""{0} GetByKey error, invalid key: ""..key );
-        return id;
+    local item = self.KeyItems[key];
+    if item == nil then
+        sGlobal:Print( ""{0} GetByKey nil key: ""..key );
+        return key;
     end
     if prop == nil then
-        return dat;
+        return item;
     end
-    if dat[prop] == nil then
-        sGlobal:Print( ""{0} GetByKey error, invalid prop: ""..prop );
-        return dat;
+    if item[prop] == nil then
+        sGlobal:Print( ""{0} GetByKey nil prop: ""..prop );
+        return item;
     end
-    return dat[prop];
+    return item[prop];
 end
 
 function data:GetCount()
@@ -259,5 +259,3 @@ return data
         }
     }
 }
-
-//
