@@ -13,7 +13,7 @@ namespace tablegen2
         {
             var mw = App.Current.MainWindow as MainWindow;
             if (mw != null)
-                mw.addMessage(string.Format(msg, args), Color.FromArgb(0xFF, 0, 200, 0));
+                mw.addMessage(string.Format(msg, args), Colors.Gray);
         }
 
         public static void Wrn(string msg, params object[] args)
@@ -27,7 +27,7 @@ namespace tablegen2
         {
             var mw = App.Current.MainWindow as MainWindow;
             if (mw != null)
-                mw.addMessage(string.Format(msg, args), Color.FromArgb(0xFF, 255, 50, 50));
+                mw.addMessage(string.Format(msg, args), Color.FromArgb(0xFF, 255, 21, 21));
         }
     }
 }

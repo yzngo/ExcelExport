@@ -77,9 +77,20 @@ namespace tablegen2.logic
         {
             var nullValue = 0;
             var invalidValue = 0;
-            for(int i = 0; i < rows_.Count; ++i )
+            for(int i = 0; i < headers_.Count; ++i)
             {
-                for (int j = 0; j < headers_.Count; j++)
+                var hdr = headers_[i];
+                IList<string> field = new List<string>() { "string","int", "double", "bool", "color", "group" };
+                if (!field.Contains<string>(hdr.FieldType))
+                {
+                    invalidValue++;
+                    Log.Err(string.Format("第 {0} 列 数据类型错误", i + 1));
+                }
+            }
+
+            for(int i = 0; i < rows_.Count; ++i)
+            {
+                for (int j = 0; j < headers_.Count; ++j)
                 {
                     var hdr = headers_[j];
                     var val = rows_[i].StrList[j];
@@ -87,7 +98,7 @@ namespace tablegen2.logic
                     string s = string.Empty;
                     if(string.IsNullOrEmpty(val) && hdr.FieldType != "group")
                     {
-                        nullValue += 1;
+                        nullValue++;
                     }
                     else
                     {
@@ -99,7 +110,7 @@ namespace tablegen2.logic
                                 {
                                     if (!int.TryParse(val, out _))
                                     {
-                                        invalidValue += 1;
+                                        invalidValue ++;
                                         Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 int 型", i + 2, j + 1,  val ));
                                     }
                                 }
@@ -108,7 +119,7 @@ namespace tablegen2.logic
                                 {
                                     if (!double.TryParse(val, out _))
                                     {
-                                        invalidValue += 1;
+                                        invalidValue++;
                                         Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 double 型", i + 2, j + 1, val ));
                                     }
                                 }
@@ -117,7 +128,7 @@ namespace tablegen2.logic
                                 {
                                     if (!bool.TryParse(val, out _))
                                     {
-                                        invalidValue += 1;
+                                        invalidValue++;
                                         Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 bool 型", i + 2, j + 1, val));
                                     }
                                 }
@@ -133,7 +144,7 @@ namespace tablegen2.logic
                                     if (val.Length != 8 || string.Compare(substring, "0x") != 0)
                                     {
 
-                                        invalidValue += 1;
+                                        invalidValue++;
                                         Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 color 型", i + 2, j + 1, val));
                                     }
                                     else
@@ -143,7 +154,7 @@ namespace tablegen2.logic
                                         {
                                             if (!HexSet.Contains<char>(val[counter]))
                                             {
-                                                invalidValue += 1;
+                                                invalidValue++;
                                                 Log.Err(string.Format("第 {0} 行 第 {1} 列 数据 {2} 类型不匹配，应为 color 型", i + 2, j + 1, val));
                                                 break;
                                             }
@@ -164,7 +175,7 @@ namespace tablegen2.logic
 
             if (invalidValue > 0)
             {
-                errmsg = string.Format("此表格中一共有 {0} 个类型错误的字段", invalidValue);
+                errmsg = string.Format("此表格中一共有 {0} 个类型错误", invalidValue);
                 return false;
             }
             else

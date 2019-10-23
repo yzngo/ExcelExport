@@ -83,13 +83,13 @@ namespace tablegen2.logic
 
             //comment       ----------------------------------------------------------------------------------
             appendFormatLineEx(sb, 0, "--[[ table define:");
-            appendFormatLineEx(sb, 1, "{0,-15} {1,-10} {2}", "name", "type", "desc");
+            appendFormatLineEx(sb, 1, "{0,-30} {1,-10} {2}", "name", "type", "desc");
             sb.AppendLine();
 
             for (int i = 0; i < data.Headers.Count; i++)
             {
                 var hdr = data.Headers[i];
-                appendFormatLineEx(sb, 1, "{0,-15} {1,-10} {2}", hdr.FieldName, hdr.FieldType, hdr.FieldDesc);
+                appendFormatLineEx(sb, 1, "{0,-30} {1,-10} {2}", hdr.FieldName, hdr.FieldType, hdr.FieldDesc);
             }
             appendFormatLineEx(sb, 0, "--]]");
             sb.AppendLine();
@@ -202,19 +202,62 @@ namespace tablegen2.logic
             appendFormatLineEx(sb, 0, "}}");
             sb.AppendLine();
 
-            sb.Append(
-@"local data = { Items = items, IdItems = idItems, KeyItems = keyItems, }
-function data:getById(id)
-    return self.IdItems[id]
-end
-function data:getByKey(key)
-    return self.KeyItems[key]
-end
-return data
-");
+            sb.Append( BuildFunction(Path.GetFileName(filePath))) ;
 
             File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(sb.ToString()));
         }
         #endregion
+
+        private static string BuildFunction( string fileName )
+        {
+            var sb = new StringBuilder();
+            sb.Append(
+@"
+local data = { Items = items, IdItems = idItems, KeyItems = keyItems, }
+");
+            sb.AppendFormat(
+@"
+function data:GetById( id, prop )
+    local dat = self.IdItems[id];
+    if dat == nil then
+        sGlobal:Print( ""{0} GetById error, invalid id: ""..id );
+        return id;
+    end
+    if prop == nil then
+        return dat;
+    end
+    if dat[prop] == nil then
+        sGlobal:Print( ""{0} GetById error, invalid prop: ""..prop );
+        return dat;
+    end
+    return dat[prop];
+end
+
+function data:GetByKey( key, prop )
+    local dat = self.KeyItems[key];
+    if dat == nil then
+        sGlobal:Print( ""{0} GetByKey error, invalid key: ""..key );
+        return id;
+    end
+    if prop == nil then
+        return dat;
+    end
+    if dat[prop] == nil then
+        sGlobal:Print( ""{0} GetByKey error, invalid prop: ""..prop );
+        return dat;
+    end
+    return dat[prop];
+end
+
+function data:GetCount()
+    return #self.IdItems;
+end
+
+return data
+", Path.GetFileName(fileName));
+            return sb.ToString();
+        }
     }
 }
+
+//

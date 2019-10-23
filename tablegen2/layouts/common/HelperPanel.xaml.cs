@@ -12,12 +12,20 @@ namespace tablegen2.layouts
 @"1.Excel格式说明：
 
   * 目前字段类型支持
-        string（字符串）
-        int（整型）
-        double（小数）
-        bool (布尔型)
-        color (16进制color值  0xFFFFFF)
-        group (table型)
+        string (字符串)          
+        int (整型)               
+        double (小数)            
+        bool (布尔型)            
+        color (格式 0xFFFFFF)    
+        group (table型)          
+
+  * 单元格留空时的导出行为定义
+        string留空 导出为""""     
+        int留空 不导出此字段   
+        double留空 不导出此字段     
+        bool留空 不导出此字段   
+        color留空 不导出此字段
+        group留空 导出为{} 
 
   * 每张表须包含两个字段名称固定且值不能重复的字段
         id（全局唯一数字索引）

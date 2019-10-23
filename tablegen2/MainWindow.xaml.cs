@@ -80,10 +80,21 @@ namespace tablegen2
             }
 
             Log.Msg("=================================================");
+            int succ = 0, failed = 0;
             foreach (var filePath in excels)
             {
-                _genSingleFileImpl(filePath, exportDir, fmt);
+                bool succeed = _genSingleFileImpl(filePath, exportDir, fmt);
+
+                if (succeed)
+                    succ++;
+                else
+                    failed++;
             }
+
+            if(failed > 0)
+                Log.Err("========== {0} 个成功， {1} 个失败 ========== ", succ, failed);
+            else
+                Log.Msg("========== {0} 个成功 ========== ", succ);
         }
         #endregion
 
@@ -221,9 +232,10 @@ namespace tablegen2
             _genSingleFileImpl(filePath, exportDir, fmt);
         }
         
-        private void _genSingleFileImpl(string filePath, string exportDir, TableExportFormat fmt)
+        private bool _genSingleFileImpl(string filePath, string exportDir, TableExportFormat fmt)
         {
-            Log.Msg("正在分析 {0}", filePath);
+            Log.Msg("----------正在导出 {0}----------", filePath);
+            string exportPath = exportDir;
             try
             {
                 TableExcelData data = TableExcelReader.loadFromExcel(filePath);
@@ -232,40 +244,42 @@ namespace tablegen2
                     throw new System.Exception(errmsg);
                 if (!data.checkDataType(out errmsg))
                     throw new System.Exception(errmsg);
-
+                
                 switch (fmt)
                 {
                     case TableExportFormat.Dat:
                         {
-                            var exportPath = Path.Combine(exportDir, string.Format("{0}.exdat", Path.GetFileNameWithoutExtension(filePath)));
+                            exportPath = Path.Combine(exportDir, string.Format("{0}.exdat", Path.GetFileNameWithoutExtension(filePath)));
                             TableExcelExportDat.exportExcelFile(data, exportPath);
                         }
                         break;
                     case TableExportFormat.Json:
                         {
-                            var exportPath = Path.Combine(exportDir, string.Format("{0}.json", Path.GetFileNameWithoutExtension(filePath)));
+                            exportPath = Path.Combine(exportDir, string.Format("{0}.json", Path.GetFileNameWithoutExtension(filePath)));
                             TableExcelExportJson.exportExcelFile(data, exportPath);
                         }
                         break;
                     case TableExportFormat.Xml:
                         {
-                            var exportPath = Path.Combine(exportDir, string.Format("{0}.xml", Path.GetFileNameWithoutExtension(filePath)));
+                            exportPath = Path.Combine(exportDir, string.Format("{0}.xml", Path.GetFileNameWithoutExtension(filePath)));
                             TableExcelExportXml.exportExcelFile(data, exportPath);
                         }
                         break;
                     case TableExportFormat.Lua:
                         {
-                            var exportPath = Path.Combine(exportDir, string.Format("{0}.lua", Path.GetFileNameWithoutExtension(filePath)));
-
+                            exportPath = Path.Combine(exportDir, string.Format("{0}.lua", Path.GetFileNameWithoutExtension(filePath)));
                             TableExcelExportLua.exportExcelFile(data, exportPath);
                         }
                         break;
                 }
-                Log.Msg("=============生成成功====================================");
+                Log.Msg("----------导出成功 {0} ----------", exportPath);
+                return true;
             }
             catch (System.Exception ex)
             {
                 Log.Err(ex.Message);
+                Log.Err("----------导出失败 {0} ----------", exportPath);
+                return false;
             }
         }
 
