@@ -105,6 +105,7 @@ namespace tablegen2.logic
                 "字段名称",
                 "字段类型",
                 "字段说明",
+                "注意事项",
             });
 
             foreach (var hdr in headers)
