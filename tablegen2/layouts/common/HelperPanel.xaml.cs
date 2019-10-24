@@ -11,6 +11,8 @@ namespace tablegen2.layouts
         public static readonly string HelpString =
 @"1.Excel格式说明：
 
+  * 复合表说明查看 【复合表demo.xlsx】文档
+
   * 目前字段类型支持
         string (字符串)          
         int (整型)               
@@ -27,7 +29,7 @@ namespace tablegen2.layouts
         bool留空 不导出此字段   
         color留空 不导出此字段
         group留空 导出为{} 
-        table留空 不导出此字段
+        table不管填什么都导出子表格
 
   * 每张表须包含两个字段名称固定且值不能重复的字段
         id（全局唯一数字索引）
