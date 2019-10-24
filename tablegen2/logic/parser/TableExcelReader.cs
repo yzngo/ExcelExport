@@ -50,10 +50,10 @@ namespace tablegen2.logic
                 throw new Exception(string.Format("'{0}'工作簿中不存在key字段！", defSheetName));
 
             //加载数据
-            var headers2 = _readHeadersFromDataSheet(sheet2);
+            var headers2 = _readHeadersFromDataSheet(sheet2, dataSheetName);
             var headerIndexes = new int[headers.Count];
 
-            _checkFieldsSame(headers, headers2, headerIndexes);
+            _checkFieldsSame(headers, headers2, headerIndexes, dataSheetName);
 
             foreach (var ds in _readDataFromDataSheet(sheet2, headers2.Count))
             {
@@ -154,7 +154,7 @@ namespace tablegen2.logic
             return headers;
         }
         
-        private static List<string> _readHeadersFromDataSheet(ISheet sheet)
+        private static List<string> _readHeadersFromDataSheet(ISheet sheet, string sheetName)
         {
             var r = new List<string>();
             var rd = sheet.GetRow(0);
@@ -173,18 +173,18 @@ namespace tablegen2.logic
             int idx = r.IndexOf(string.Empty);
             if (idx >= 0)
                 throw new Exception(string.Format(
-                    "'{0}'工作簿中第1行第{1}列字段名称非法", AppData.Config.SheetNameForData, idx + 1));
+                    "'{0}'工作簿中第1行第{1}列字段名称非法", sheetName, idx + 1));
             return r;
         }
 
-        private static void _checkFieldsSame(List<TableExcelHeader> headers1, List<string> headers2, int[] indexes)
+        private static void _checkFieldsSame(List<TableExcelHeader> headers1, List<string> headers2, int[] indexes, string sheetName)
         {
             for (int i = 0; i < headers1.Count; i++)
             {
                 var hd = headers1[i];
                 var idx = headers2.IndexOf(hd.FieldName);
                 if (idx < 0)
-                    throw new Exception(string.Format("'{0}'工作簿中不存在字段'{1}'所对应的列", AppData.Config.SheetNameForData, hd.FieldName));
+                    throw new Exception(string.Format("'{0}'工作簿中不存在字段'{1}'所对应的列", sheetName, hd.FieldName));
                 indexes[i] = idx;
             }
             if (headers1.Count < headers2.Count)
@@ -192,7 +192,7 @@ namespace tablegen2.logic
                 foreach (var s in headers2)
                 {
                     if (headers1.Find(a => a.FieldName == s) == null)
-                        throw new Exception(string.Format("'{0}'工作簿中的包含多余的数据列'{1}'", AppData.Config.SheetNameForData, s));
+                        throw new Exception(string.Format("'{0}'工作簿中包含多余的数据列'{1}'", sheetName, s));
                 }
             }
         }

@@ -58,18 +58,6 @@ namespace tablegen2.logic
                 ids.Add(id);
                 keys.Add(strKeyName);
             }
-            //for (int i = 0; i < Headers.Count; i++)
-            //{
-            //    var hdr = Headers[i];
-            //    if( hdr.FieldType == "table" )
-            //    {
-            //        ChildData[i].checkUnique(out errmsg);
-            //        if(errmsg != string.Empty)
-            //        {
-            //            return false;
-            //        }
-            //    } 
-            //}
 
             errmsg = string.Empty;
             return true;
@@ -97,7 +85,7 @@ namespace tablegen2.logic
                     var hdr = Headers[j];
                     var val = Rows[i].StrList[j];
                     
-                    if(string.IsNullOrEmpty(val) && hdr.FieldType != "group")
+                    if(string.IsNullOrEmpty(val) && hdr.FieldType != "group" && hdr.FieldType != "table")
                     {
                         nullValue++;
                     }

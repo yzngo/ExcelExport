@@ -66,11 +66,13 @@ namespace tablegen2.logic
         private static string BuildDataString(TableExcelData data, string key)
         {
             var luaString = new StringBuilder();
-            int item = 0;
+
             foreach (var row in data.Rows)
             {
-
-
+                if (key == string.Empty)
+                {
+                    luaString.Append("    ");
+                }
                 if (key != string.Empty && key != row.StrList[1])
                     continue;
                 luaString.Append("{ ");
@@ -122,9 +124,21 @@ namespace tablegen2.logic
                             }
                             break;
                     }
-                    luaString.AppendFormat("{0} = {1},", hdr.FieldName, s);
+                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
+                        continue;
+
+                    luaString.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
+                    
                 }
-                luaString.AppendLine("}");
+                if(key == string.Empty)
+                {
+                    luaString.AppendLine("},");
+                }
+                else
+                {
+                    luaString.Append("}");
+                }
+                
 
             }
             return luaString.ToString();
@@ -141,7 +155,6 @@ namespace tablegen2.logic
 
             luaString.Append(BuildDataString(data, string.Empty));
 
-            
             appendFormatLineEx(luaString, 0, "}}");
             luaString.AppendLine();
             luaString.Append(BuildItemString(data));
