@@ -29,5 +29,12 @@ namespace tablegen2
             if (mw != null)
                 mw.addMessage(string.Format(msg, args), Color.FromArgb(0xFF, 255, 21, 21));
         }
+
+        public static void Suc(string msg, params object[] args)
+        {
+            var mw = App.Current.MainWindow as MainWindow;
+            if (mw != null)
+                mw.addMessage(string.Format(msg, args), Color.FromArgb(0xFF,187, 255, 4));
+        }
     }
 }

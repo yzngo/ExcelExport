@@ -94,7 +94,7 @@ namespace tablegen2
             if(failed > 0)
                 Log.Err("========== {0} 个成功， {1} 个失败 ========== ", succ, failed);
             else
-                Log.Msg("========== {0} 个成功 ========== ", succ);
+                Log.Suc("========== {0} 个成功 ========== ", succ);
         }
         #endregion
 

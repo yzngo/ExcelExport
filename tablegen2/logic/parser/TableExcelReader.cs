@@ -40,14 +40,14 @@ namespace tablegen2.logic
                 throw new Exception(string.Format("'{0}'工作簿不存在", dataSheetName));
 
             //加载字段
-           var headers = _readHeadersFromDefSheet(sheet1, row, column);
+           var headers = _readHeadersFromDefSheet(sheet1, row, column, defSheetName);
             var h1 = headers.Find(a => a.FieldName == "id");
             if (h1 == null)
-                throw new Exception(string.Format("'{0}'工作簿中不存在id字段！", defSheetName));
+                throw new Exception(string.Format("'{0}'工作簿{1}行{2}列缺失id字段！", defSheetName, row, column + 1));
 
             var h2 = headers.Find(a => a.FieldName == "key");
             if (h2 == null)
-                throw new Exception(string.Format("'{0}'工作簿中不存在key字段！", defSheetName));
+                throw new Exception(string.Format("'{0}'工作簿{1}行{2}列缺失key字段！", defSheetName, row, column + 1));
 
             //加载数据
             var headers2 = _readHeadersFromDataSheet(sheet2, dataSheetName);
@@ -84,9 +84,18 @@ namespace tablegen2.logic
                     {
                         string s = cell.Hyperlink.Address;
                         char[] addr = s.ToCharArray();
-
-                        int x = addr[5] - '0';
-                        int y = addr[4] - 'A';
+                        int x = 0;
+                        int y = 0;
+                        if(s.Length == 6)
+                        {
+                            x = addr[5] - '0';
+                            y = addr[4] - 'A';
+                        }
+                        else
+                        {
+                            x = addr[6] - '0';
+                            y = (addr[4] - 'A' + 1) * 26 + addr[5] - 'A';
+                        }
                         data.ChildData.Add(str1, _readDataFromWorkbook(wb, defSheetName, x, y, str1));
                     }
                 }
@@ -119,7 +128,7 @@ namespace tablegen2.logic
             return r;
         }
 
-        private static List<TableExcelHeader> _readHeadersFromDefSheet( ISheet sheet, int row, int column )
+        private static List<TableExcelHeader> _readHeadersFromDefSheet( ISheet sheet, int row, int column, string sheetName )
         {
             
             var headers = new List<TableExcelHeader>();
@@ -149,7 +158,7 @@ namespace tablegen2.logic
                 }
 
                 throw new Exception(string.Format(
-                    "'{0}'工作簿中第{1}行数据异常，有缺失！", sheet, r + 1));
+                    "'{0}'工作簿中第{1}行第{2}列数据异常，有缺失！", sheetName, r + 1, column + 1));
             }
             return headers;
         }
