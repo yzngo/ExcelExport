@@ -24,13 +24,13 @@ namespace tablegen2.logic
         {
             var luaString = new StringBuilder();
             appendFormatLineEx(luaString, 0, "--[[ table define:");
-            appendFormatLineEx(luaString, 1, "{0,-30} {1,-10} {2}", "name", "type", "desc");
+            appendFormatLineEx(luaString, 1, "{0,-25} {1,-10} {2}", "name", "type", "desc");
             luaString.AppendLine();
 
             for (int i = 0; i < headers.Count; i++)
             {
                 var hdr = headers[i];
-                appendFormatLineEx(luaString, 1, "{0,-30} {1,-10} {2}", hdr.FieldName, hdr.FieldType, hdr.FieldDesc);
+                appendFormatLineEx(luaString, 1, "{0,-25} {1,-10} {2}", hdr.FieldName, hdr.FieldType, hdr.FieldDesc);
             }
             appendFormatLineEx(luaString, 0, "--]]");
             luaString.AppendLine();
