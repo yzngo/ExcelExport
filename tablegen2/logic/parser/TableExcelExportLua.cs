@@ -66,7 +66,7 @@ namespace tablegen2.logic
         private static string BuildDataString(TableExcelData data, string key)
         {
             var luaString = new StringBuilder();
-
+            int lbracket = 0, rbracket = 0; ;
             foreach (var row in data.Rows)
             {
                 if (key == string.Empty)
@@ -76,10 +76,17 @@ namespace tablegen2.logic
                 if (key != string.Empty && key != row.StrList[1])
                     continue;
                 luaString.Append("{ ");
+                lbracket++;
                 for (int i = 0; i < data.Headers.Count; i++)
                 {
                     var hdr = data.Headers[i];
                     var val = row.StrList[i];
+
+                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
+                        continue;
+
+                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "group" || hdr.FieldType == "string" || hdr.FieldType == "table"))
+                        continue;
 
                     string s = string.Empty;
                     switch (hdr.FieldType)
@@ -124,23 +131,20 @@ namespace tablegen2.logic
                             }
                             break;
                     }
-                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
-                        continue;
-
-                    luaString.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
-                    
+                    if(!string.IsNullOrEmpty(s))
+                        luaString.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
                 }
                 if(key == string.Empty)
-                {
                     luaString.AppendLine("},");
-                }
                 else
-                {
                     luaString.Append("}");
-                }
-                
-
+                rbracket++;
             }
+            if (lbracket != rbracket)
+                Log.Err("key: {2} Bracket mismatch {0} to {1}", lbracket, rbracket, key);
+            //else if (lbracket == 0)
+            //    luaString.Append("{}");
+
             return luaString.ToString();
         }
 
