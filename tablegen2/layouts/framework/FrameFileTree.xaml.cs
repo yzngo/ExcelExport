@@ -60,13 +60,13 @@ namespace tablegen2.layouts
                 {
                     FieldName = "id",
                     FieldType = "int",
-                    FieldDesc = "唯一Id索引",
+                    FieldDesc = "唯一数字索引",
                 },
                 new TableExcelHeader()
                 {
                     FieldName = "key",
                     FieldType = "string",
-                    FieldDesc = "唯一Key索引",
+                    FieldDesc = "唯一字符串索引",
                 },
             });
 

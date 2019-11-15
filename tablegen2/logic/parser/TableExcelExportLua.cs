@@ -11,7 +11,7 @@ namespace tablegen2.logic
         {
             exportLua_Impl(data, filePath);
         }
-
+         
         public static void appendFormatLineEx(StringBuilder sb, int indent, string fmtstr, params object[] args)
         {
             if (indent > 0)
@@ -23,14 +23,35 @@ namespace tablegen2.logic
         private static string BuildCommentString( List<TableExcelHeader> headers )
         {
             var luaString = new StringBuilder();
-            appendFormatLineEx(luaString, 0, "--[[ table define:");
-            appendFormatLineEx(luaString, 1, "{0,-25} {1,-10} {2}", "name", "type", "desc");
-            luaString.AppendLine();
+            luaString.Append(
+@"--[[
+function define:
+    GetByIndex( index, prop );
+    GetById( id, prop );
+    GetCount();
+
+item define:
+");
+            appendFormatLineEx(luaString, 1, "{0,-25} {1,-15} {2}", "____name", "____type", "____desc");
 
             for (int i = 0; i < headers.Count; i++)
             {
                 var hdr = headers[i];
-                appendFormatLineEx(luaString, 1, "{0,-25} {1,-10} {2}", hdr.FieldName, hdr.FieldType, hdr.FieldDesc);
+
+                var name = hdr.FieldName;
+                var desc = hdr.FieldDesc;
+                if (hdr.FieldName == "id")
+                {
+                    name = "index";
+                    desc = "唯一数字索引";
+                }
+                else if (hdr.FieldName == "key")
+                {
+                    name = "id";
+                    desc = "唯一字符串索引";
+                }
+                    
+                appendFormatLineEx(luaString, 1, "{0,-25} {1,-15} {2}", name, hdr.FieldType, desc);
             }
             appendFormatLineEx(luaString, 0, "--]]");
             luaString.AppendLine();
@@ -60,6 +81,7 @@ namespace tablegen2.logic
                 luaString.AppendLine();
                 luaString.AppendLine();
             }
+            appendFormatLineEx(luaString, 0, "--To consider the programmer's habits,replace the 'id' and 'key' in Excel with 'index' and 'id'");
             return luaString.ToString();
         }
 
@@ -131,8 +153,15 @@ namespace tablegen2.logic
                             }
                             break;
                     }
-                    if(!string.IsNullOrEmpty(s))
-                        luaString.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        if(hdr.FieldName == "id")
+                            luaString.AppendFormat("{0} = {1}, ", "index", s);
+                        else if(hdr.FieldName == "key")
+                            luaString.AppendFormat("{0} = {1}, ", "id", s);
+                        else
+                            luaString.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
+                    }  
                 }
                 if(key == string.Empty)
                     luaString.AppendLine("},");
@@ -194,7 +223,7 @@ namespace tablegen2.logic
                 }
             }
 
-            appendFormatLineEx(luaString, 0, "local idItems = ");
+            appendFormatLineEx(luaString, 0, "local indexItems = ");
             appendFormatLineEx(luaString, 0, "{{");
             for (int i = 0; i < ids.Count; i++)
             {
@@ -203,7 +232,7 @@ namespace tablegen2.logic
             appendFormatLineEx(luaString, 0, "}}");
             luaString.AppendLine();
 
-            appendFormatLineEx(luaString, 0, "local keyItems = ");
+            appendFormatLineEx(luaString, 0, "local idItems = ");
             appendFormatLineEx(luaString, 0, "{{");
             for (int i = 0; i < keys.Count; i++)
             {
@@ -219,14 +248,30 @@ namespace tablegen2.logic
             var luaString = new StringBuilder();
             luaString.Append(
 @"
-local data = { Items = items, IdItems = idItems, KeyItems = keyItems, }
+local data = { Items = items, IndexItems = indexItems, IdItems = idItems, }
 ");
             luaString.AppendFormat(
 @"
+function data:GetByIndex( index, prop )
+    local item = self.IndexItems[index];
+    if item == nil then
+        sGlobal:Print( ""{0} GetByIndex nil item: ""..index );
+        return index;
+    end
+    if prop == nil then
+        return item;
+    end
+    if item[prop] == nil then
+        sGlobal:Print( ""{0} GetByIndex nil prop: ""..prop );
+        return item;
+    end
+    return item[prop];
+end
+
 function data:GetById( id, prop )
     local item = self.IdItems[id];
     if item == nil then
-        sGlobal:Print( ""{0} GetById nil item: ""..id );
+        sGlobal:Print( ""{0} GetById nil id: ""..id );
         return id;
     end
     if prop == nil then
@@ -239,24 +284,8 @@ function data:GetById( id, prop )
     return item[prop];
 end
 
-function data:GetByKey( key, prop )
-    local item = self.KeyItems[key];
-    if item == nil then
-        sGlobal:Print( ""{0} GetByKey nil key: ""..key );
-        return key;
-    end
-    if prop == nil then
-        return item;
-    end
-    if item[prop] == nil then
-        sGlobal:Print( ""{0} GetByKey nil prop: ""..prop );
-        return item;
-    end
-    return item[prop];
-end
-
 function data:GetCount()
-    return #self.IdItems;
+    return #self.IndexItems;
 end
 
 return data
