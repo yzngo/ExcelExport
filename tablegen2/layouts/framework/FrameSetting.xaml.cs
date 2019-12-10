@@ -25,6 +25,7 @@ namespace tablegen2.layouts
                 txtExcelDir.Text = AppData.Config.ExcelDir;
                 txtExportDir.Text = AppData.Config.ExportDir;
                 cbExportFormat.SelectComboBoxItemByTag(AppData.Config.ExportFormat.ToString());
+                indentCheckBox.IsChecked = AppData.Config.OutputLuaWithIndent;
             }
         }
 
@@ -108,6 +109,18 @@ namespace tablegen2.layouts
         {
             if (MoreSettingEvent != null)
                 MoreSettingEvent.Invoke();
+        }
+
+        private void indent_Checked(object sender, RoutedEventArgs e)
+        {
+            AppData.Config.OutputLuaWithIndent = true;
+            AppData.saveConfig();
+        }
+
+        private void indent_Unchecked(object sender, RoutedEventArgs e)
+        {
+            AppData.Config.OutputLuaWithIndent = false;
+            AppData.saveConfig();
         }
     }
 }

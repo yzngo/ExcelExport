@@ -167,17 +167,10 @@ namespace tablegen2.layouts
                 {
                     var miExport = new MenuItem();
                     miExport.Header = menuText;
-                    miExport.Click += (_s, _e) => AppData.MainWindow.genSingleFile(item.FullPath, AppData.Config.ExportDir, AppData.Config.ExportFormat);
+                    miExport.Click += (_s, _e) => AppData.MainWindow.genSingleFile(item.FullPath, AppData.Config.ExportDir, AppData.Config.ExportFormat );
                     menu.Items.Add(miExport);
                 }
             }
-
-            //美化Excel格式
-            var miRectify = new MenuItem();
-            miRectify.Header = "美化Excel表";
-            miRectify.Click += (_s, _e) => AppData.MainWindow.rectifyFileFormat(item.FullPath);
-            menu.Items.Add(miRectify);
-            menu.Items.Add(new Separator());
 
             var miExplorer = new MenuItem();
             miExplorer.Header = "打开所在文件夹";
@@ -208,12 +201,6 @@ namespace tablegen2.layouts
                     CreateExcelEvent.Invoke();
             };
             menu.Items.Add(miCreate);
-            menu.Items.Add(new Separator());
-
-            var miExcelFormat = new MenuItem();
-            miExcelFormat.Header = "一键美化Excel表";
-            miExcelFormat.Click += (_s, _e) => AppData.MainWindow.rectifyAllFileFormat(AllExcels.ToList());
-            menu.Items.Add(miExcelFormat);
             menu.Items.Add(new Separator());
 
             var miExplorer = new MenuItem();

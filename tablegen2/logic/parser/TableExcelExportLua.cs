@@ -28,6 +28,8 @@ namespace tablegen2.logic
 function define:
     GetByIndex( index, prop );
     GetById( id, prop );
+    GetIdByIndex( index );
+    GetIndexById( id );
     GetCount();
 
 item define:
@@ -85,19 +87,39 @@ item define:
             return luaString.ToString();
         }
 
-        private static string BuildDataString(TableExcelData data, string key)
+        private static string BuildDataString(TableExcelData data, string key, int iDeep)
         {
+            bool bWithIndent = AppData.Config.OutputLuaWithIndent;
             var luaString = new StringBuilder();
             int lbracket = 0, rbracket = 0; ;
             foreach (var row in data.Rows)
             {
                 if (key == string.Empty)
                 {
-                    luaString.Append("    ");
+                    if(bWithIndent == true)
+                    {
+                        for (int t = 1; t <= iDeep - 1; t++)
+                        {
+                            luaString.Append("    ");
+                        }
+                    }
+                    else
+                    {
+                        luaString.Append("    ");
+                    }
+ 
                 }
                 if (key != string.Empty && key != row.StrList[1])
                     continue;
-                luaString.Append("{ ");
+
+                if(bWithIndent == true)
+                {
+                    luaString.Append("{ \n");
+                }
+                else
+                {
+                    luaString.Append("{ ");
+                }
                 lbracket++;
                 for (int i = 0; i < data.Headers.Count; i++)
                 {
@@ -149,24 +171,58 @@ item define:
                             break;
                         case "table":
                             {
-                                s = BuildDataString(data.ChildData[hdr.FieldName], row.StrList[1]);
+                                s = BuildDataString(data.ChildData[hdr.FieldName], row.StrList[1], iDeep + 1);
                             }
                             break;
                     }
                     if (!string.IsNullOrEmpty(s))
                     {
-                        if(hdr.FieldName == "id")
+                        if(bWithIndent == true)
+                        {
+                            for (int t = 1; t <= iDeep; t++)
+                            {
+                                luaString.Append("    ");
+                            }
+                        }
+
+                        if (hdr.FieldName == "id")
                             luaString.AppendFormat("{0} = {1}, ", "index", s);
                         else if(hdr.FieldName == "key")
                             luaString.AppendFormat("{0} = {1}, ", "id", s);
                         else
                             luaString.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
+                        
+                        if(bWithIndent == true)
+                        {
+                            luaString.Append("\n");
+                        }
                     }  
                 }
-                if(key == string.Empty)
-                    luaString.AppendLine("},");
+
+                if(key != string.Empty && bWithIndent == true)
+                {
+                    for (int t = 1; t <= iDeep - 1; t++)
+                    {
+                        luaString.Append("    ");
+                    }
+                }
+
+                if (key == string.Empty)
+                {
+                    if (bWithIndent == true)
+                    {
+                        luaString.AppendLine("    }, \n");
+                    }
+                    else
+                    {
+                        luaString.AppendLine("},");
+                    }
+                }
                 else
+                {
                     luaString.Append("}");
+                }
+                    
                 rbracket++;
             }
             if (lbracket != rbracket)
@@ -186,8 +242,8 @@ item define:
             appendFormatLineEx(luaString, 0, "local items = ");
             appendFormatLineEx(luaString, 0, "{{");
 
-            luaString.Append(BuildDataString(data, string.Empty));
-
+            luaString.Append(BuildDataString(data, string.Empty, 2));
+            
             appendFormatLineEx(luaString, 0, "}}");
             luaString.AppendLine();
             luaString.Append(BuildItemString(data));
@@ -282,6 +338,14 @@ function data:GetById( id, prop )
         return item;
     end
     return item[prop];
+end
+
+function data:GetIdByIndex( index )
+    return data:GetByIndex( index, ""id"" );
+end
+
+function data:GetIndexById( id )
+    return data:GetById( id, ""index"" );
 end
 
 function data:GetCount()

@@ -24,7 +24,6 @@
         -->
         <el:FrameSetting x:Name="setting" Grid.Row="0"/>
         <Border Grid.Row="1" Background="#EEEEEE"/>
-
         <Grid Grid.Row="2" HorizontalAlignment="Left" Width="792">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250" MinWidth="200"/>
@@ -39,12 +38,12 @@
         </Grid>
 
         <Grid Grid.Row="3" Background="#EEEEEE">
-            
+
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <el:ButtonLight Content="使用帮助 (F1)" Width="100" Height="30" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,5,0" Click="btnHelp_Clicked"/>
+                <el:ButtonLight Content="使用帮助 (F1)" Width="100" Height="25" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,5,0" Click="btnHelp_Clicked"/>
+                <el:ButtonLight Content="清空日志" Width="100" Height="25" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Left" Click="btnClear_Clicked"/>
                 <el:ButtonDark x:Name="btnGenAll" Width="150" Height="36" Margin="5,0,5,0" Content="请选择生成的数据格式" Tag="一键生成{0}格式" Click="btnGenAll_Clicked"/>
             </StackPanel>
-            <el:ButtonLight Content="清空日志" Width="100" Height="30" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="403,10,0,10" Click="btnClear_Clicked"/>
 
         </Grid>
     </Grid>

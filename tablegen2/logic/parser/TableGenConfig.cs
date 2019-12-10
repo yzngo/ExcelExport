@@ -8,5 +8,7 @@
 
         public string SheetNameForField = string.Empty;
         public string SheetNameForData = string.Empty;
+
+        public bool OutputLuaWithIndent = true;
     }
 }
