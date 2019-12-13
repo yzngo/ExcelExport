@@ -114,11 +114,11 @@ item define:
 
                 if(bWithIndent == true)
                 {
-                    luaString.Append("{ \n");
+                    luaString.Append("{\n");
                 }
                 else
                 {
-                    luaString.Append("{ ");
+                    luaString.Append("{");
                 }
                 lbracket++;
                 for (int i = 0; i < data.Headers.Count; i++)
@@ -186,11 +186,11 @@ item define:
                         }
 
                         if (hdr.FieldName == "id")
-                            luaString.AppendFormat("{0} = {1}, ", "index", s);
+                            luaString.AppendFormat("{0} = {1},", "index", s);
                         else if(hdr.FieldName == "key")
-                            luaString.AppendFormat("{0} = {1}, ", "id", s);
+                            luaString.AppendFormat("{0} = {1},", "id", s);
                         else
-                            luaString.AppendFormat("{0} = {1}, ", hdr.FieldName, s);
+                            luaString.AppendFormat("{0} = {1},", hdr.FieldName, s);
                         
                         if(bWithIndent == true)
                         {
@@ -239,7 +239,7 @@ item define:
             var luaString = new StringBuilder();
             luaString.Append(BuildCommentString(data.Headers));
 
-            appendFormatLineEx(luaString, 0, "local items = ");
+            appendFormatLineEx(luaString, 0, "local items =");
             appendFormatLineEx(luaString, 0, "{{");
 
             luaString.Append(BuildDataString(data, string.Empty, 2));
