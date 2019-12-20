@@ -196,6 +196,10 @@ item define:
                         {
                             luaString.Append("\n");
                         }
+                        else
+                        {
+                            luaString.Append(" ");
+                        }
                     }  
                 }
 
