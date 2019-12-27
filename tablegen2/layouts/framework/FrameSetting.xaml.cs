@@ -122,5 +122,17 @@ namespace tablegen2.layouts
             AppData.Config.OutputLuaWithIndent = false;
             AppData.saveConfig();
         }
+
+        private void fit_Unity3D(object sender, RoutedEventArgs e)
+        {
+            AppData.Config.FitUnity3D = true;
+            AppData.saveConfig();
+        }
+
+        private void fit_Zendo(object sender, RoutedEventArgs e)
+        {
+            AppData.Config.FitUnity3D = false;
+            AppData.saveConfig();
+        }
     }
 }

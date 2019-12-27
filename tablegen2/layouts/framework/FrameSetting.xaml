@@ -39,6 +39,7 @@
                     <ComboBoxItem Height="20" Content="Lua格式" Tag="Lua" Margin="0,1,0,1" Selected="exportFormat_Selected"/>
                 </ComboBox>
                 <CheckBox x:Name="indentCheckBox" Content="换行缩进" HorizontalAlignment="Left" Margin="5,5,5,5" VerticalAlignment="Center" Checked="indent_Checked" Unchecked="indent_Unchecked" IsChecked="True"/>
+                <CheckBox x:Name="fitUnity3D" Content="Unity3D适配" HorizontalAlignment="Left" Margin="5,5,5,5" VerticalAlignment="Center" Checked="fit_Unity3D" Unchecked="fit_Zendo" IsChecked="False"/>
             </StackPanel>
             
             <el:ButtonDark Grid.Row="3" Width="80" Height="20" Content="更多设置..." VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,18,0" Click="btnMoreSetting_Clicked"/>

@@ -10,5 +10,6 @@
         public string SheetNameForData = string.Empty;
 
         public bool OutputLuaWithIndent = true;
+        public bool FitUnity3D = false;
     }
 }

@@ -97,7 +97,12 @@ namespace tablegen2.layouts
                 }
                 else if (fp.EndsWith(".lua"))
                 {
-                    TableExcelExportLua.exportExcelFile(data_, filePath_);
+                    var filePath = filePath_;
+                    if(AppData.Config.FitUnity3D == true)
+                    {
+                        filePath += ".txt";
+                    }
+                    TableExcelExportLua.exportExcelFile(data_, filePath);
                 }
                 Window.GetWindow(this).Close();
             }

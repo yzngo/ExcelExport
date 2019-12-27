@@ -267,6 +267,10 @@ namespace tablegen2
                     case TableExportFormat.Lua:
                         {
                             exportPath = Path.Combine(exportDir, string.Format("{0}.lua", Path.GetFileNameWithoutExtension(filePath)));
+                            if(AppData.Config.FitUnity3D == true)
+                            {
+                                exportPath += ".txt";
+                            }
                             TableExcelExportLua.exportExcelFile(data, exportPath);
                         }
                         break;
