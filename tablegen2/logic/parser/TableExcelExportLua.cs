@@ -215,7 +215,7 @@ item define:
                 {
                     if (bWithIndent == true)
                     {
-                        luaString.AppendLine("    }, \n");
+                        luaString.AppendLine("    },\n");
                     }
                     else
                     {
