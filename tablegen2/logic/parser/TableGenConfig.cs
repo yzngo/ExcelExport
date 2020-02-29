@@ -1,4 +1,5 @@
-﻿namespace tablegen2.logic
+﻿using System.Collections.Generic;
+namespace tablegen2.logic
 {
     public class TableGenConfig
     {
@@ -11,5 +12,8 @@
 
         public bool OutputLuaWithIndent = true;
         public bool FitUnity3D = false;
+
+        public Dictionary<string, int> ExcelDirHistory;
+        public Dictionary<string, int> ExportDirHistory;
     }
 }

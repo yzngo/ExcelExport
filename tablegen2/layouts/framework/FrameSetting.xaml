@@ -19,14 +19,14 @@
             </Border>
             <Grid Grid.Row="1">
                 <TextBlock Width="100" TextAlignment="Right" Text="配置目录：" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="Gray" HorizontalAlignment="Left"/>
-                <TextBox x:Name="txtExcelDir" Height="20" FontSize="10" VerticalAlignment="Center" IsReadOnly="True" Margin="100,0,100,0"/>
-                <el:ButtonLight x:Name="btnBrowseExcelDir" Content="浏览" Width="30" Height="20" HorizontalAlignment="Right" Margin="0,0,68,0" Click="btnBrowseExcelDir_Clicked"/>
+                <ComboBox x:Name="boxExcelDir"  Height="22" FontSize="12" MaxDropDownHeight="200" Margin="100,0,100,0"  />  
+              <el:ButtonLight x:Name="btnBrowseExcelDir" Content="浏览" Width="30" Height="20" HorizontalAlignment="Right" Margin="0,0,68,0" Click="btnBrowseExcelDir_Clicked"/>
                 <el:ButtonLight x:Name="btnOpenExcelDir" Content="打开" Width="30" Height="20" HorizontalAlignment="Right" Margin="0,0,36,0" Click="btnOpenExcelDir_Clicked"/>
             </Grid>
             <Grid Grid.Row="2">
                 <TextBlock Width="100" TextAlignment="Right" Text="输出目录：" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="Gray" HorizontalAlignment="Left"/>
-                <TextBox x:Name="txtExportDir" Height="20" FontSize="10" VerticalAlignment="Center" IsReadOnly="True" Margin="100,0,100,0"/>
-                <el:ButtonLight Content="浏览" Width="30" Height="20" HorizontalAlignment="Right" Margin="0,0,68,0" Click="btnBrowseExportDir_Clicked"/>
+                <ComboBox x:Name="boxExportDir"  Height="22" FontSize="12" MaxDropDownHeight="200" Margin="100,0,100,0"  />
+              <el:ButtonLight Content="浏览" Width="30" Height="20" HorizontalAlignment="Right" Margin="0,0,68,0" Click="btnBrowseExportDir_Clicked"/>
                 <el:ButtonLight x:Name="btnOpenExportDir" Content="打开" Width="30" Height="20" HorizontalAlignment="Right" Margin="0,0,36,0" Click="btnOpenExportDir_Clicked"/>
             </Grid>
             <StackPanel Grid.Row="3" Orientation="Horizontal">

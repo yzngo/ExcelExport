@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using tablegen2.logic;
-
+using System.Collections.Generic;
 namespace tablegen2.layouts
 {
     /// <summary>
@@ -22,11 +22,57 @@ namespace tablegen2.layouts
             InitializeComponent();
             if (AppData.Config != null)
             {
-                txtExcelDir.Text = AppData.Config.ExcelDir;
-                txtExportDir.Text = AppData.Config.ExportDir;
                 cbExportFormat.SelectComboBoxItemByTag(AppData.Config.ExportFormat.ToString());
                 indentCheckBox.IsChecked = AppData.Config.OutputLuaWithIndent;
+                InitComboBox();
             }
+        }
+
+        public void InitComboBox()
+        {
+            if(AppData.Config.ExcelDirHistory != null)
+            {
+                boxExcelDir.Items.Clear();
+                List<string> key1 = new List<string>(AppData.Config.ExcelDirHistory.Keys);
+                for (int i = key1.Count - 1; i >= 0; i--)
+                {
+                    boxExcelDir.Items.Add(key1[i]);
+                }
+                boxExcelDir.SelectedItem = AppData.Config.ExcelDir;
+                boxExcelDir.SelectionChanged += BoxExcelDir_SelectionChanged;
+
+            }
+  
+            if(AppData.Config.ExportDirHistory != null)
+            {
+                boxExportDir.Items.Clear();
+                List<string> key2 = new List<string>(AppData.Config.ExportDirHistory.Keys);
+                for (int i = key2.Count - 1; i >= 0; i--)
+                {
+                    boxExportDir.Items.Add(key2[i]);
+                }
+                boxExportDir.SelectedItem = AppData.Config.ExportDir;
+                boxExportDir.SelectionChanged += BoxExportDir_SelectionChanged;
+            }
+
+        }
+
+        private void BoxExcelDir_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string dir = boxExcelDir.SelectedItem.ToString();
+                AppData.Config.ExcelDir = dir;
+                AppData.saveConfig();
+            if (ExcelDirChanged != null)
+                ExcelDirChanged.Invoke();
+        }
+
+        private void BoxExportDir_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string dir = boxExportDir.SelectedItem.ToString();
+            AppData.Config.ExportDir = dir;
+            AppData.saveConfig();
+            if (ExportDirChanged != null)
+                ExportDirChanged.Invoke();
         }
 
         public void browseExcelDirectory()
@@ -47,6 +93,7 @@ namespace tablegen2.layouts
             }
         }
 
+
         private void btnBrowseExcelDir_Clicked(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -56,8 +103,26 @@ namespace tablegen2.layouts
             {
                 if (!string.IsNullOrEmpty(dialog.SelectedPath))
                 {
-                    txtExcelDir.Text = dialog.SelectedPath;
+                    //boxExcelDir.Text = dialog.SelectedPath;
                     AppData.Config.ExcelDir = dialog.SelectedPath;
+
+                    if(AppData.Config.ExcelDirHistory == null)
+                    {
+                        AppData.Config.ExcelDirHistory = new Dictionary<string, int>();
+                    }
+                    if (AppData.Config.ExcelDirHistory.ContainsKey(dialog.SelectedPath))
+                    {
+                        AppData.Config.ExcelDirHistory[dialog.SelectedPath] += 1;
+                    }
+                    else
+                    {
+                        AppData.Config.ExcelDirHistory[dialog.SelectedPath] = 1;
+                        boxExcelDir.Items.Add(dialog.SelectedPath);
+                    }
+                    boxExcelDir.SelectedItem = dialog.SelectedPath;
+                    Dictionary<string, int> temp = AppData.Config.ExcelDirHistory.OrderBy(o => o.Value).ToDictionary(p=>p.Key, o=>o.Value);
+                    AppData.Config.ExcelDirHistory = temp;
+
                     AppData.saveConfig();
                     if (ExcelDirChanged != null)
                         ExcelDirChanged.Invoke();
@@ -74,8 +139,26 @@ namespace tablegen2.layouts
             {
                 if (!string.IsNullOrEmpty(dialog.SelectedPath))
                 {
-                    txtExportDir.Text = dialog.SelectedPath;
+                    //txtExportDir.Text = dialog.SelectedPath;
                     AppData.Config.ExportDir = dialog.SelectedPath;
+
+                    if (AppData.Config.ExportDirHistory == null)
+                    {
+                        AppData.Config.ExportDirHistory = new Dictionary<string, int>();
+                    }
+                    if (AppData.Config.ExportDirHistory.ContainsKey(dialog.SelectedPath))
+                    {
+                        AppData.Config.ExportDirHistory[dialog.SelectedPath] += 1;
+                    }
+                    else
+                    {
+                        AppData.Config.ExportDirHistory[dialog.SelectedPath] = 1;
+                        boxExportDir.Items.Add(dialog.SelectedPath);
+                        
+                    }
+                    boxExportDir.SelectedItem = dialog.SelectedPath;
+                    Dictionary<string, int> temp = AppData.Config.ExportDirHistory.OrderBy(o => o.Value).ToDictionary(p => p.Key, o => o.Value);
+                    AppData.Config.ExportDirHistory = temp;
                     AppData.saveConfig();
                     if (ExportDirChanged != null)
                         ExportDirChanged.Invoke();
@@ -134,5 +217,7 @@ namespace tablegen2.layouts
             AppData.Config.FitUnity3D = false;
             AppData.saveConfig();
         }
+
+
     }
 }

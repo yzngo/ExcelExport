@@ -19,7 +19,7 @@ namespace tablegen2
             AppData.MainWindow = this;
 
             InitializeComponent();
-            
+
             setting.ExcelDirChanged += () => tree.refreshExcelPath(AppData.Config.ExcelDir);
             setting.ExportFormatChanged += () => refreshButtonGenAll();
             setting.MoreSettingEvent += () => _flipMoreSettingPanel();
@@ -91,7 +91,7 @@ namespace tablegen2
                     failed++;
             }
 
-            if(failed > 0)
+            if (failed > 0)
                 Log.Err("========== {0} 个成功， {1} 个失败 ========== ", succ, failed);
             else
                 Log.Suc("========== {0} 个成功 ========== ", succ);
@@ -104,7 +104,7 @@ namespace tablegen2
                 console.addMessage(msg, color);
         }
 
-       public void clearLog()
+        public void clearLog()
         {
             console.clearMessage();
         }
@@ -206,7 +206,7 @@ namespace tablegen2
                 }
             }
             Log.Msg("优化完毕！");
-        } 
+        }
 
         public void genSingleFile(string filePath, string exportDir, TableExportFormat fmt)
         {
@@ -231,7 +231,7 @@ namespace tablegen2
             Log.Msg("=================================================");
             _genSingleFileImpl(filePath, exportDir, fmt);
         }
-        
+
         private bool _genSingleFileImpl(string filePath, string exportDir, TableExportFormat fmt)
         {
             Log.Msg("----------正在导出 {0}----------", filePath);
@@ -267,7 +267,7 @@ namespace tablegen2
                     case TableExportFormat.Lua:
                         {
                             exportPath = Path.Combine(exportDir, string.Format("{0}.lua", Path.GetFileNameWithoutExtension(filePath)));
-                            if(AppData.Config.FitUnity3D == true)
+                            if (AppData.Config.FitUnity3D == true)
                             {
                                 exportPath += ".txt";
                             }
