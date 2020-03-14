@@ -14,7 +14,8 @@ namespace tablegen2.layouts
   * 复合表说明查看 【复合表demo.xlsx】文档
 
   * 目前字段类型支持
-        string (字符串)          
+        string (字符串)    
+        string(nil) 字符串,留空不导出
         int (整型)               
         double (小数)            
         bool (布尔型)            
@@ -23,7 +24,8 @@ namespace tablegen2.layouts
         table (子表类型) 
 
   * 单元格留空时的导出行为定义
-        string留空 导出为""""     
+        string留空 导出为 = """"     
+        string(nil) 不导出此字段
         int留空 不导出此字段   
         double留空 不导出此字段     
         bool留空 不导出此字段   

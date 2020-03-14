@@ -138,6 +138,9 @@ item define:
                         case "string":
                             s = string.Format("\"{0}\"", val);
                             break;
+                        case "string(nil)":
+                            s = string.Format("\"{0}\"", val);
+                            break;
                         case "int":
                             {
                                 int n = 0;

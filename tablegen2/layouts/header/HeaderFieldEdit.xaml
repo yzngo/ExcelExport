@@ -24,6 +24,7 @@
         <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtFieldName" Text="{Binding FieldName}" IsReadOnly="{Binding IsFieldNameReadonly}" Height="20" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,20,0"/>
         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="cbFieldType" FontWeight="Bold" Height="22" FontSize="12" MaxDropDownHeight="200" Margin="10,0,20,0" BorderBrush="{StaticResource CommonBorder}" VerticalContentAlignment="Center">
             <ComboBoxItem Height="20" Content="string" Tag="string" IsSelected="True" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="string(nil)" Tag="color" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="int" Tag="int" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="double" Tag="double" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="bool" Tag="bool" Margin="0,1,0,1" />

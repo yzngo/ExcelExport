@@ -47,6 +47,9 @@ namespace tablegen2.logic
                     case 7:
                         fieldType = "table";
                         break;
+                    case 8:
+                        fieldType = "string(nil)";
+                        break;
                     default:
                         throw new Exception(string.Format("无法识别的字段类型 fieldName:{0} fieldType:{1}", fieldName, ftype));
                 }
@@ -80,6 +83,9 @@ namespace tablegen2.logic
                             lst.Add(br.ReadInt32().ToString());
                             break;
                         case "table":
+                            lst.Add(br.ReadUtf8String());
+                            break;
+                        case "string(nil)":
                             lst.Add(br.ReadUtf8String());
                             break;
                     }
