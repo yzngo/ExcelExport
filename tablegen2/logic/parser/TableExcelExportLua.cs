@@ -143,22 +143,19 @@ item define:
                             break;
                         case "int":
                             {
-                                int n = 0;
-                                int.TryParse(val, out n);
+                                int.TryParse(val, out int n);
                                 s = n.ToString();
                             }
                             break;
                         case "double":
                             {
-                                double n = 0;
-                                double.TryParse(val, out n);
+                                double.TryParse(val, out double n);
                                 s = n.ToString();
                             }
                             break;
                         case "bool":
                             {
-                                bool n = true;
-                                bool.TryParse(val, out n);
+                                bool.TryParse(val, out bool n);
                                 s = n == true ? "true" : "false";
                             }
                             break;

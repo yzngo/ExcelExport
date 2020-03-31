@@ -21,22 +21,44 @@ namespace tablegen2.logic
                     switch (hdr.FieldType)
                     {
                         case "string":
+                        case "string(nil)":
+                        case "color":
                             obj = val;
                             break;
                         case "int":
                             {
-                                int n = 0;
-                                int.TryParse(val, out n);
+                                int.TryParse(val, out int n);
                                 obj = n;
                             }
                             break;
                         case "double":
                             {
-                                double n = 0;
-                                double.TryParse(val, out n);
+                                double.TryParse(val, out double n);
                                 obj = n;
                             }
                             break;
+                        case "bool":
+                            {
+                                bool.TryParse(val, out bool n);
+                                obj = n;
+                            }
+                            break;
+                        case "group":
+                            {
+                                var str = val.Split(',');
+                                var num = new List<double>();
+                                foreach (var s in str)
+                                {
+                                    double.TryParse(s, out double n);
+                                    num.Add(n);
+                                }
+                                obj = num;
+                            }
+                            break;
+                        case "table":
+                            {
+                                break;
+                            }
                     }
                     r[hdr.FieldName] = obj;
                 }
