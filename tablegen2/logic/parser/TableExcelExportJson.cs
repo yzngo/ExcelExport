@@ -10,13 +10,36 @@ namespace tablegen2.logic
     {
         public static void exportExcelFile(TableExcelData data, string filePath)
         {
-            List<Dictionary<string, object>> lst = data.Rows.Select(a =>
+            List<Dictionary<string, object>> lst = ExportData(data, string.Empty);
+
+            var indent = AppData.Config.OutputLuaWithIndent ? Formatting.Indented : Formatting.None;
+            string output = JsonConvert.SerializeObject(lst, indent);
+            File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(output));
+        }
+
+        public static List<Dictionary<string, object>> ExportData(TableExcelData data, string key)
+        {
+            List<Dictionary<string, object>> lst = new List<Dictionary<string, object>>();
+
+            foreach (var row in data.Rows)
             {
                 var r = new Dictionary<string, object>();
+                if (key != string.Empty && key != row.StrList[1])
+                {
+                    break;
+                }
                 for (int i = 0; i < data.Headers.Count; i++)
                 {
                     var hdr = data.Headers[i];
-                    var val = a.StrList[i];
+                    var val = row.StrList[i];
+                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
+                    {
+                        continue;
+                    }
+                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "group" || hdr.FieldType == "string" || hdr.FieldType == "table"))
+                    {
+                        continue;
+                    }
                     object obj = null;
                     switch (hdr.FieldType)
                     {
@@ -57,16 +80,16 @@ namespace tablegen2.logic
                             break;
                         case "table":
                             {
+                                obj = ExportData(data.ChildData[hdr.FieldName], row.StrList[1]);
                                 break;
                             }
                     }
                     r[hdr.FieldName] = obj;
                 }
-                return r;
-            }).ToList();
-
-            string output = JsonConvert.SerializeObject(lst, Formatting.Indented);
-            File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(output));
+                lst.Add(r);
+                //return r;
+            }//).ToList();
+            return lst;
         }
     }
 }
