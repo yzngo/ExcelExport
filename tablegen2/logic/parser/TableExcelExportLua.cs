@@ -169,7 +169,7 @@ item define:
                                 s = string.Format("{0:X}", val);
                             }
                             break;
-                        case "table":
+                        case "table":                       
                             {
                                 s = BuildDataString(data.ChildData[hdr.FieldName], row.StrList[1], iDeep + 1);
                             }

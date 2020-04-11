@@ -97,7 +97,16 @@ namespace tablegen2.logic
                                 break;
                             }
                     }
-                    r[hdr.FieldName] = obj;
+                    if (hdr.FieldName == "id")
+                    {
+                        r["index"] = obj;
+                    } else if (hdr.FieldName == "key")
+                    {
+                        r["id"] = obj;
+                    } else
+                    {
+                        r[hdr.FieldName] = obj;
+                    }
                 }
                 lst.Add(r);
             }
