@@ -11,6 +11,33 @@ namespace tablegen2.logic
 {
     public static class TableExcelExportJson
     {
+        public class CustomJsonTextWriter : JsonTextWriter
+        {
+            public CustomJsonTextWriter(TextWriter writer) : base(writer)
+            {
+            }
+
+            protected override void WriteIndent()
+            {
+                if (WriteState != WriteState.Array)
+                    base.WriteIndent();
+                else
+                    WriteIndentSpace();
+            }
+        }
+
+        public static string SerializeWithCustomIndenting(object obj)
+        {
+            using (StringWriter sw = new StringWriter())
+            using (JsonWriter jw = new CustomJsonTextWriter(sw))
+            {
+                jw.Formatting = Formatting.Indented;
+                JsonSerializer ser = new JsonSerializer();
+                ser.Serialize(jw, obj);
+                return sw.ToString();
+            }
+        }
+
         public static void exportExcelFile(TableExcelData data, string filePath)
         {
             List<Dictionary<string, object>> lst = ExportData(data);
@@ -19,7 +46,8 @@ namespace tablegen2.logic
             // var fileName = Path.GetFileNameWithoutExtension(filePath);
             // temp[fileName] = lst;
             var indent = AppData.Config.OutputLuaWithIndent ? Formatting.Indented : Formatting.None;
-            string output = JsonConvert.SerializeObject(lst, indent);
+            string output = SerializeWithCustomIndenting(lst);
+            //string output = JsonConvert.SerializeObject(lst, indent);
             File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(output));
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace tablegen2.logic
 {
@@ -16,18 +17,18 @@ namespace tablegen2.logic
         private static void exportCS_Impl(TableExcelData data, string filePath)
         {
             var csString = new StringBuilder();
-            csString.Append(BuildPrologue(data.Headers));
-            // csString.Append(BuildCommentString(data.Headers));
-
-           // appendFormatLineEx(csString, 0, "local items =");
-           // appendFormatLineEx(csString, 0, "{{");
+            csString.Append( BuildPrologue() );
+            csString.Append( BuildTitle(filePath) );
+            // appendFormatLineEx(csString, 0, "local items =");
+            // appendFormatLineEx(csString, 0, "{{");
 
             //csString.Append(BuildDataString(data, string.Empty, 2));
 
             //appendFormatLineEx(csString, 0, "}}");
             //csString.AppendLine();
             //csString.Append(BuildItemString(data));
-            csString.Append(BuildFuncString(Path.GetFileName(filePath)));
+            //csString.Append(BuildFuncString(Path.GetFileName(filePath)));
+            csString.Append(BuildEnd());
             File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(csString.ToString()));
         }
         #endregion
@@ -40,24 +41,202 @@ namespace tablegen2.logic
             sb.AppendLine();
         }
 
-        private static string BuildPrologue( List<TableExcelHeader> headers )
+//-- 构造开头 ---------------------------------------------------------------------------------------------------------------------------
+        private static string BuildPrologue()
         {
             var prologue = new StringBuilder();
             prologue.Append(
 @"
+using System.Collections.Generic;
+
 namespace Feamber.Data
 {
-    using System;
-    using System.Collections.Generic;
-
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-}
 ");
             return prologue.ToString();
         }
 
+
+
+
+ //-- 构造类名 ---------------------------------------------------------------------------------------------------------------------------
+        private static string BuildTitle(string path)
+        {
+            var title = new StringBuilder();
+            title.AppendLine($"    public sealed class {Path.GetFileNameWithoutExtension(path)} : IData");
+            title.AppendLine("    {");
+            return title.ToString();
+        }
+
+//-- 构造成员 ---------------------------------------------------------------------------------------------------------------------------
+        private static string BuildDataString(TableExcelData data, string key, int iDeep)
+        {
+            bool bWithIndent = AppData.Config.OutputLuaWithIndent;
+            var csString = new StringBuilder();
+            int lbracket = 0, rbracket = 0; ;
+            foreach (var row in data.Rows)
+            {
+                if (key == string.Empty)
+                {
+                    if (bWithIndent == true)
+                    {
+                        for (int t = 1; t <= iDeep - 1; t++)
+                        {
+                            csString.Append("    ");
+                        }
+                    }
+                    else
+                    {
+                        csString.Append("    ");
+                    }
+
+                }
+                if (key != string.Empty && key != row.StrList[1])
+                    continue;
+
+                if (bWithIndent == true)
+                {
+                    csString.Append("{\n");
+                }
+                else
+                {
+                    csString.Append("{");
+                }
+                lbracket++;
+                for (int i = 0; i < data.Headers.Count; i++)
+                {
+                    var hdr = data.Headers[i];
+                    var val = row.StrList[i];
+
+                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
+                        continue;
+
+                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "group" || hdr.FieldType == "string" || hdr.FieldType == "table"))
+                        continue;
+
+                    string s = string.Empty;
+                    switch (hdr.FieldType)
+                    {
+                        case "string":
+                            s = string.Format("\"{0}\"", val);
+                            break;
+                        case "string(nil)":
+                            s = string.Format("\"{0}\"", val);
+                            break;
+                        case "int":
+                            {
+                                int.TryParse(val, out int n);
+                                s = n.ToString();
+                            }
+                            break;
+                        case "double":
+                            {
+                                double.TryParse(val, out double n);
+                                s = n.ToString();
+                            }
+                            break;
+                        case "bool":
+                            {
+                                bool.TryParse(val, out bool n);
+                                s = n == true ? "true" : "false";
+                            }
+                            break;
+                        case "group":
+                            {
+                                s = string.Format("{{{0}}}", val);
+                            }
+                            break;
+                        case "color":
+                            {
+                                s = string.Format("{0:X}", val);
+                            }
+                            break;
+                        case "table":
+                            {
+                                s = BuildDataString(data.ChildData[hdr.FieldName], row.StrList[1], iDeep + 1);
+                            }
+                            break;
+                    }
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        if (bWithIndent == true)
+                        {
+                            for (int t = 1; t <= iDeep; t++)
+                            {
+                                csString.Append("    ");
+                            }
+                        }
+
+                        if (hdr.FieldName == "id")
+                            csString.AppendFormat("{0} = {1},", "index", s);
+                        else if (hdr.FieldName == "key")
+                            csString.AppendFormat("{0} = {1},", "id", s);
+                        else
+                            csString.AppendFormat("{0} = {1},", hdr.FieldName, s);
+
+                        if (bWithIndent == true)
+                        {
+                            csString.Append("\n");
+                        }
+                        else
+                        {
+                            csString.Append(" ");
+                        }
+                    }
+                }
+
+                if (key != string.Empty && bWithIndent == true)
+                {
+                    for (int t = 1; t <= iDeep - 1; t++)
+                    {
+                        csString.Append("    ");
+                    }
+                }
+
+                if (key == string.Empty)
+                {
+                    if (bWithIndent == true)
+                    {
+                        csString.AppendLine("    },\n");
+                    }
+                    else
+                    {
+                        csString.AppendLine("},");
+                    }
+                }
+                else
+                {
+                    csString.Append("}");
+                }
+
+                rbracket++;
+            }
+            if (lbracket != rbracket)
+                Log.Err("key: {2} Bracket mismatch {0} to {1}", lbracket, rbracket, key);
+            //else if (lbracket == 0)
+            //    csString.Append("{}");
+
+            return csString.ToString();
+        }
+
+
+//-- 构造结尾 ---------------------------------------------------------------------------------------------------------------------------
+        private static string BuildEnd()
+        {
+            var end = new StringBuilder();
+            _ = end.Append(
+@"
+    }
+}
+");
+            return end.ToString();
+        }
+
+
+
+
+
+
+//-------------------------------------------------------------------------------------------------------------------
         private static string BuildCommentString( List<TableExcelHeader> headers )
         {
             var luaString = new StringBuilder();
@@ -118,155 +297,7 @@ item define:
             return luaString.ToString();
         }
 
-        private static string BuildDataString(TableExcelData data, string key, int iDeep)
-        {
-            bool bWithIndent = AppData.Config.OutputLuaWithIndent;
-            var csString = new StringBuilder();
-            int lbracket = 0, rbracket = 0; ;
-            foreach (var row in data.Rows)
-            {
-                if (key == string.Empty)
-                {
-                    if(bWithIndent == true)
-                    {
-                        for (int t = 1; t <= iDeep - 1; t++)
-                        {
-                            csString.Append("    ");
-                        }
-                    }
-                    else
-                    {
-                        csString.Append("    ");
-                    }
- 
-                }
-                if (key != string.Empty && key != row.StrList[1])
-                    continue;
 
-                if(bWithIndent == true)
-                {
-                    csString.Append("{\n");
-                }
-                else
-                {
-                    csString.Append("{");
-                }
-                lbracket++;
-                for (int i = 0; i < data.Headers.Count; i++)
-                {
-                    var hdr = data.Headers[i];
-                    var val = row.StrList[i];
-
-                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
-                        continue;
-
-                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "group" || hdr.FieldType == "string" || hdr.FieldType == "table"))
-                        continue;
-
-                    string s = string.Empty;
-                    switch (hdr.FieldType)
-                    {
-                        case "string":
-                            s = string.Format("\"{0}\"", val);
-                            break;
-                        case "string(nil)":
-                            s = string.Format("\"{0}\"", val);
-                            break;
-                        case "int":
-                            {
-                                int.TryParse(val, out int n);
-                                s = n.ToString();
-                            }
-                            break;
-                        case "double":
-                            {
-                                double.TryParse(val, out double n);
-                                s = n.ToString();
-                            }
-                            break;
-                        case "bool":
-                            {
-                                bool.TryParse(val, out bool n);
-                                s = n == true ? "true" : "false";
-                            }
-                            break;
-                        case "group":
-                            {
-                                s = string.Format("{{{0}}}", val);
-                            }
-                            break;
-                        case "color":
-                            {
-                                s = string.Format("{0:X}", val);
-                            }
-                            break;
-                        case "table":                       
-                            {
-                                s = BuildDataString(data.ChildData[hdr.FieldName], row.StrList[1], iDeep + 1);
-                            }
-                            break;
-                    }
-                    if (!string.IsNullOrEmpty(s))
-                    {
-                        if(bWithIndent == true)
-                        {
-                            for (int t = 1; t <= iDeep; t++)
-                            {
-                                csString.Append("    ");
-                            }
-                        }
-
-                        if (hdr.FieldName == "id")
-                            csString.AppendFormat("{0} = {1},", "index", s);
-                        else if(hdr.FieldName == "key")
-                            csString.AppendFormat("{0} = {1},", "id", s);
-                        else
-                            csString.AppendFormat("{0} = {1},", hdr.FieldName, s);
-                        
-                        if(bWithIndent == true)
-                        {
-                            csString.Append("\n");
-                        }
-                        else
-                        {
-                            csString.Append(" ");
-                        }
-                    }  
-                }
-
-                if(key != string.Empty && bWithIndent == true)
-                {
-                    for (int t = 1; t <= iDeep - 1; t++)
-                    {
-                        csString.Append("    ");
-                    }
-                }
-
-                if (key == string.Empty)
-                {
-                    if (bWithIndent == true)
-                    {
-                        csString.AppendLine("    },\n");
-                    }
-                    else
-                    {
-                        csString.AppendLine("},");
-                    }
-                }
-                else
-                {
-                    csString.Append("}");
-                }
-                    
-                rbracket++;
-            }
-            if (lbracket != rbracket)
-                Log.Err("key: {2} Bracket mismatch {0} to {1}", lbracket, rbracket, key);
-            //else if (lbracket == 0)
-            //    csString.Append("{}");
-
-            return csString.ToString();
-        }
 
 
         private static string BuildItemString(TableExcelData data)
