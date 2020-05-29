@@ -19,7 +19,10 @@ namespace tablegen2.layouts
         double (小数)              [ 1.001  ]
         bool (布尔型)              [ true ] / [ false ]
         color (格式 0xFFFFFF)      [ 0xFDFFFF ]
-        group (数组类型)           [ 1,2,3,4,5]  /  [ ""a"",""b"",""c"",""d"",""e"" ]
+        group (数组)              [ ""a"",""b"",""c"",""d"",""e"" ]
+        group(int) 整数数组         [ 1,2,3,4,5 ]
+        group(double) 小数数组      [ 0.1, 0.2, 0.3 ]
+        group(bool) 布尔数组        [ true, false, true ]
         table (子表类型) 
 
   * 单元格留空时的导出行为定义
@@ -34,8 +37,8 @@ namespace tablegen2.layouts
             如果父表中某个key对应的项在子表格中不存在，则不导出此字段
 
   * 每张表须包含两个字段名称固定且值不能重复的字段
-        id（全局唯一数字索引）
-        key（全局唯一字符串索引）
+        Id（全局唯一数字索引）
+        Key（全局唯一字符串索引）
 
   * 每张表须包含两个工作簿
         字段工作簿def（用于声明字段名称、字段类型、字段描述）

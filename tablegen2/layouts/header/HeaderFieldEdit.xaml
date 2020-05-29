@@ -23,15 +23,18 @@
         <TextBlock Grid.Row="2" Grid.Column="0" Text="字段描述：" Foreground="Gray" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtFieldName" Text="{Binding FieldName}" IsReadOnly="{Binding IsFieldNameReadonly}" Height="20" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,20,0"/>
         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="cbFieldType" FontWeight="Bold" Height="22" FontSize="12" MaxDropDownHeight="200" Margin="10,0,20,0" BorderBrush="{StaticResource CommonBorder}" VerticalContentAlignment="Center">
-            <ComboBoxItem Height="20" Content="string" Tag="string" IsSelected="True" Margin="0,1,0,1"/>
-            <ComboBoxItem Height="20" Content="string(nil)" Tag="color" Margin="0,1,0,1"/>
-            <ComboBoxItem Height="20" Content="int" Tag="int" Margin="0,1,0,1"/>
-            <ComboBoxItem Height="20" Content="double" Tag="double" Margin="0,1,0,1"/>
-            <ComboBoxItem Height="20" Content="bool" Tag="bool" Margin="0,1,0,1" />
-            <ComboBoxItem Height="20" Content="group" Tag="group" Margin="0,1,0,1"/>
-            <ComboBoxItem Height="20" Content="color" Tag="color" Margin="0,1,0,1"/>
-            <ComboBoxItem Height="20" Content="table" Tag="color" Margin="0,1,0,1"/>
-            
+            <ComboBoxItem Height="20" Content="string          字符串  [ demo ]" Tag="string" IsSelected="True" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="int             整数           [   1  ]" Tag="int" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="double      小数          [ 0.01 ]" Tag="double" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="bool        布尔量        [ true ]   [false]" Tag="bool" Margin="0,1,0,1" />
+            <ComboBoxItem Height="20" Content="group      字符串数组    [ &quot;a&quot;,&quot;b&quot; ]" Tag="group" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="group(int)     整数数组      [ 1,2,3  ]" Tag="group(int)" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="group(double)  小数数组  [ 0.01, 0.02  ]" Tag="group(double)" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="group(bool)   布尔数组    [ false, true  ]" Tag="group(bool)" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="table          二级列表" Tag="table" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="color       颜色值        [ 0xFFDA34 ]" Tag="color" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="string(nil)   兼容老lua项目" Tag="string(nil)" Margin="0,1,0,1"/>
+
         </ComboBox>
         <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FieldDesc}" FontSize="10" Margin="10,20,20,20" TextWrapping="Wrap"/>
         <Grid Grid.Row="3" Grid.ColumnSpan="2" Background="#40000000">

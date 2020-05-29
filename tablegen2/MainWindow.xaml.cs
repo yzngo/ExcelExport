@@ -259,7 +259,7 @@ namespace tablegen2
                             string fileName = Path.GetFileNameWithoutExtension(filePath);
                             fileName = fileName.Substring(0, 1).ToUpper() + fileName.Substring(1);
                             exportPath = Path.Combine(exportDir, string.Format($"{ fileName }.cs"));
-                            TableExcelExportCs.exportExcelFile(data, exportPath);
+                            TableExcelExportCs.ExportExcelFile(data, exportPath);
                         }
                         break;
                     case TableExportFormat.Xml:

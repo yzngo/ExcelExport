@@ -41,11 +41,11 @@ namespace tablegen2.logic
 
             //加载字段
            var headers = _readHeadersFromDefSheet(sheet1, row, column, defSheetName);
-            var h1 = headers.Find(a => a.FieldName == "id");
+            var h1 = headers.Find(a => a.FieldName.ToLower() == "id");
             if (h1 == null)
                 throw new Exception(string.Format("'{0}'工作簿{1}行{2}列缺失id字段！", defSheetName, row, column + 1));
 
-            var h2 = headers.Find(a => a.FieldName == "key");
+            var h2 = headers.Find(a => a.FieldName.ToLower() == "key");
             if (h2 == null)
                 throw new Exception(string.Format("'{0}'工作簿{1}行{2}列缺失key字段！", defSheetName, row, column + 1));
 

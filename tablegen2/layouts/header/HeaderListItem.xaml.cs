@@ -44,7 +44,7 @@ namespace tablegen2.layouts
             get { return (string)GetValue(FieldNameProperty); }
             set
             {
-                if (value == "id" || value == "key")
+                if (value.ToLower() == "id" || value.ToLower() == "key" )
                     Editable = false;
                 SetValue(FieldNameProperty, value);
             }

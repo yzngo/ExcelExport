@@ -42,12 +42,12 @@ item define:
 
                 var name = hdr.FieldName;
                 var desc = hdr.FieldDesc;
-                if (hdr.FieldName == "id")
+                if (hdr.FieldName.ToLower() == "id")
                 {
                     name = "index";
                     desc = "唯一数字索引";
                 }
-                else if (hdr.FieldName == "key")
+                else if (hdr.FieldName.ToLower() == "key")
                 {
                     name = "id";
                     desc = "唯一字符串索引";
@@ -126,10 +126,10 @@ item define:
                     var hdr = data.Headers[i];
                     var val = row.StrList[i];
 
-                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
+                    if (key != string.Empty && (hdr.FieldName.ToLower() == "id" || hdr.FieldName.ToLower() == "key"))
                         continue;
 
-                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "group" || hdr.FieldType == "string" || hdr.FieldType == "table"))
+                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType.Contains("group") || hdr.FieldType == "string" || hdr.FieldType == "table"))
                         continue;
 
                     string s = string.Empty;
@@ -159,7 +159,7 @@ item define:
                                 s = n == true ? "true" : "false";
                             }
                             break;
-                        case "group":
+                        case var a when a.Contains("group"):
                             {
                                 s = string.Format("{{{0}}}", val);
                             }
@@ -185,9 +185,9 @@ item define:
                             }
                         }
 
-                        if (hdr.FieldName == "id")
+                        if (hdr.FieldName.ToLower() == "id")
                             luaString.AppendFormat("{0} = {1},", "index", s);
-                        else if(hdr.FieldName == "key")
+                        else if(hdr.FieldName.ToLower() == "key")
                             luaString.AppendFormat("{0} = {1},", "id", s);
                         else
                             luaString.AppendFormat("{0} = {1},", hdr.FieldName, s);
@@ -267,14 +267,14 @@ item define:
                     var hdr = data.Headers[i];
                     var val = row.StrList[i];
                     string s = string.Empty;
-                    if (hdr.FieldName == "id")
+                    if (hdr.FieldName.ToLower() == "id")
                     {
                         int n = 0;
                         int.TryParse(val, out n);
                         s = n.ToString();
                         ids.Add(s);
                     }
-                    else if (hdr.FieldName == "key")
+                    else if (hdr.FieldName.ToLower() == "key")
                     {
                         s = string.Format("\"{0}\"", val);
                         keys.Add(s);

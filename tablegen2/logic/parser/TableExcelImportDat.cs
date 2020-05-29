@@ -50,6 +50,15 @@ namespace tablegen2.logic
                     case 8:
                         fieldType = "string(nil)";
                         break;
+                    case 9:
+                        fieldType = "group(int)";
+                        break;
+                    case 10:
+                        fieldType = "group(double)";
+                        break;
+                    case 11:
+                        fieldType = "group(bool)";
+                        break;
                     default:
                         throw new Exception(string.Format("无法识别的字段类型 fieldName:{0} fieldType:{1}", fieldName, ftype));
                 }
@@ -73,7 +82,7 @@ namespace tablegen2.logic
                         case "double":
                             lst.Add(br.ReadDouble().ToString());
                             break;
-                        case "group":
+                        case var a when a.Contains("group"):
                             lst.Add(br.ReadUtf8String());
                             break;
                         case "bool":

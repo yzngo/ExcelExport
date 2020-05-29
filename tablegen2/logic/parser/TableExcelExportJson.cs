@@ -60,7 +60,7 @@ namespace tablegen2.logic
                     var hdr = data.Headers[i];
                     var val = row.StrList[i];
 
-                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "group" || hdr.FieldType == "string" || hdr.FieldType == "table"))
+                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType.Contains("group") || hdr.FieldType == "string" || hdr.FieldType == "table"))
                     {
                         continue;
                     }
@@ -90,10 +90,20 @@ namespace tablegen2.logic
                                 obj = n;
                             }
                             break;
-                        case "group":
+                        case var a when a.Contains("group"):
                             {
                                 var str = val.Split(',');
                                 bool succeed = false;
+                                {
+                                    var numlist = new List<int>();
+                                    foreach (var s in str)
+                                    {
+                                        succeed = int.TryParse(s, out int n);
+                                        numlist.Add(n);
+                                    }
+                                    obj = numlist;
+                                }
+                                if (succeed == false)
                                 {
                                     var numlist = new List<double>();
                                     foreach (var s in str)
@@ -121,12 +131,12 @@ namespace tablegen2.logic
                                 break;
                             }
                     }
-                    if (hdr.FieldName == "id")
+                    if (hdr.FieldName.ToLower() == "id")
                     {
-                        r["index"] = obj;
-                    } else if (hdr.FieldName == "key")
+                        r["Index"] = obj;
+                    } else if (hdr.FieldName.ToLower() == "key")
                     {
-                        r["id"] = obj;
+                        r["Id"] = obj;
                     } else
                     {
                         r[hdr.FieldName] = obj;
@@ -150,11 +160,11 @@ namespace tablegen2.logic
                 {
                     var hdr = data.Headers[i];
                     var val = row.StrList[i];
-                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
+                    if (key != string.Empty && ((hdr.FieldName.ToLower() == "id" || (hdr.FieldName.ToLower() == "key" ))))
                     {
                         continue;
                     }
-                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "group" || hdr.FieldType == "string" || hdr.FieldType == "table"))
+                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType.Contains("group") || hdr.FieldType == "string" || hdr.FieldType == "table"))
                     {
                         continue;
                     }
@@ -184,15 +194,15 @@ namespace tablegen2.logic
                                 obj = n;
                             }
                             break;
-                        case "group":
+                        case var a when a.Contains("group"):
                             {
                                 var str = val.Split(',');
                                 bool succeed = false;
                                 {
-                                    var numlist = new List<double>();
+                                    var numlist = new List<int>();
                                     foreach (var s in str)
                                     {
-                                        succeed = double.TryParse(s, out double n);
+                                        succeed = int.TryParse(s, out int n);
                                         numlist.Add(n);
                                     }
                                     obj = numlist;

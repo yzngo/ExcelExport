@@ -1,130 +1,156 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace tablegen2.logic
 {
     public static class TableExcelExportCs
     {
-        public static void exportExcelFile(TableExcelData data, string filePath)
+        public static void ExportExcelFile(TableExcelData data, string filePath)
         {
-            exportCS_Impl(data, filePath);
-        }
-
-        #region export cs class
-        private static void exportCS_Impl(TableExcelData data, string filePath)
-        {
-            
             var csString = new StringBuilder();
-            csString.Append( BuildPrologue() );
-            csString.Append( BuildTitle(filePath) );
-            // appendFormatLineEx(csString, 0, "local items =");
-            // appendFormatLineEx(csString, 0, "{{");
 
-            csString.Append(BuildDataString(data, string.Empty, 1));
+            csString.AppendPrologue();
+            csString.AppendTitle(filePath);
+            csString.AppendProperty(data, string.Empty, 1);
+            csString.AppendEnd();
 
-            //appendFormatLineEx(csString, 0, "}}");
-            //csString.AppendLine();
-            //csString.Append(BuildItemString(data));
-            //csString.Append(BuildFuncString(Path.GetFileName(filePath)));
-            csString.Append(BuildEnd());
             File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(csString.ToString()));
         }
-        #endregion
 
-        public static void appendFormatLineEx(this StringBuilder sb, int indent, string fmtstr, params object[] args)
+        //-- 构造开头 ---------------------------------------------------------------------------------------------------------------------------
+        private static void AppendPrologue(this StringBuilder sb)
         {
-            if (indent > 0)
-                sb.Append(new String(' ', indent * 4));
-            sb.AppendFormat(fmtstr, args);
-            sb.AppendLine();
-        } 
-
-//-- 构造开头 ---------------------------------------------------------------------------------------------------------------------------
-        private static string BuildPrologue()
-        {
-            var prologue = new StringBuilder();
-            prologue.Append(
+            sb.Append(
 @"
 using System.Collections.Generic;
 
 namespace Feamber.Data
 {
 ");
-            return prologue.ToString();
         }
 
-
-
-
- //-- 构造类名 ---------------------------------------------------------------------------------------------------------------------------
-        private static string BuildTitle(string path)
+        //-- 构造类名 ---------------------------------------------------------------------------------------------------------------------------
+        private static void AppendTitle(this StringBuilder sb, string path)
         {
-            var title = new StringBuilder();
-            title.AppendLine($"    public sealed class {Path.GetFileNameWithoutExtension(path)} : IData");
-            title.AppendLine("    {");
-            return title.ToString();
+            sb.AppendLine($"    public sealed class {Path.GetFileNameWithoutExtension(path)} : IData");
+            sb.AppendLine("    {");
         }
 
-//-- 构造成员 ---------------------------------------------------------------------------------------------------------------------------
-        private static string BuildDataString(TableExcelData data, string key, int deep)
+        //-- 构造成员 ---------------------------------------------------------------------------------------------------------------------------
+        private static void AppendProperty(this StringBuilder sb, TableExcelData data, string key, int deep)
         {
-
-            var csString = new StringBuilder();
-
             for (int i = 0; i < data.Headers.Count; i++)
             {
                 var header = data.Headers[i];
-                //var value = data.Rows[1].StrList[i];
+                
+                if (key != string.Empty && (header.FieldName.ToLower() == "id" || header.FieldName.ToLower() == "key"))
+                    continue;
 
-                //if (key != string.Empty && (header.FieldName == "id" || header.FieldName == "key"))
-                //    continue;
-
-                //if (string.IsNullOrEmpty(value) && !(header.FieldType == "group" || header.FieldType == "string" || header.FieldType == "table"))
-                //    continue;
                 string type = header.FieldType;
                 string name = header.FieldName;
-                if (type == "group")
-                {
-                    //  s = string.Format("{{{0}}}", value);
+                string desc = header.FieldDesc;
 
+                if (desc != string.Empty)
+                {
+                    if (name.ToLower() == "id") { desc = "唯一数字索引 (1~N)"; }
+                    else if (name.ToLower() == "key") { desc = "唯一字符串索引"; }
+                    sb.AppendComment(desc, deep);
+                }
+
+                if (type.Contains("group"))
+                {
+                    type = GetGroupType(type, data.Rows[0].StrList[i]);
+                    sb.AppendListProperty(type, name, deep);
                 }
                 else if (type == "table")
                 {
-                    //    s = BuildDataString(data.ChildData[header.FieldName], data.Rows[1].StrList[1], deep + 1);
-
+                    sb.AppendNestedClassTitle(name, deep);
+                    sb.AppendProperty(data.ChildData[name], data.Rows[1].StrList[1], deep + 1);
+                    sb.AppendNestedClassEnd(deep);
                 }
                 else
                 {
-                    if (name.ToLower() == "id")     { name = "Index"; }
-                    if (name.ToLower() == "key")    { name = "Id"; }
+                    if (name.ToLower() == "id") { name = "Index"; }
+                    if (name.ToLower() == "key") { name = "Id"; }
+
                     if (type.ToLower() == "string(nil)") { type = "string"; }
                     if (type.ToLower() == "double") { type = "float"; }
                     if (type.ToLower() == "color") { type = "string"; }
-                    csString.AppendNormalProperty(type, name, deep);
+                    sb.AppendNormalProperty(type, name, deep);
+                }
+                if (i != data.Headers.Count-1)
+                {
+                    sb.AppendLine();
                 }
             }
-            return csString.ToString();
         }
 
 
-//-- 构造结尾 ---------------------------------------------------------------------------------------------------------------------------
-        private static string BuildEnd()
+        //-- 构造结尾 ---------------------------------------------------------------------------------------------------------------------------
+        private static void AppendEnd(this StringBuilder sb)
         {
-            var end = new StringBuilder();
-            _ = end.Append(
-@"
-    }
-}
-");
-            return end.ToString();
+            sb.AppendLine("    }");
+            sb.Append("}");
         }
 
+        //-- Append Property -------------------------------------------------------------------------------------------------------------------------
+        private static void AppendNormalProperty(this StringBuilder sb, string type, string name, int deep)
+        {
+            sb.AppendIndent(deep);
+            sb.AppendLine($"public {type} {name} {{ get; set; }}");
+        }
 
+        private static void AppendListProperty(this StringBuilder sb, string type, string name, int deep)
+        {
+            sb.AppendIndent(deep);
+            sb.AppendLine($"public List<{type}> {name} {{ get; set; }}");
+        }
 
-        public static void AppendIndent(this StringBuilder sb, int deep)
+        private static void AppendNestedClassTitle(this StringBuilder sb, string name, int deep)
+        {
+            sb.AppendIndent(deep);
+            sb.AppendLine($"public Type_{name} {name} {{ get; set; }}");
+            sb.AppendLine();
+            sb.AppendIndent(deep);
+            sb.AppendLine($"public class Type_{name}");
+            sb.AppendIndent(deep);
+            sb.AppendLine("{");
+        }
+
+        private static void AppendNestedClassEnd(this StringBuilder sb, int deep)
+        {
+            sb.AppendIndent(deep);
+            sb.AppendLine("}");
+        }
+
+        private static void AppendComment(this StringBuilder sb, string comment, int deep)
+        {
+            var commentList = comment.Split('\n');
+            foreach (var c in commentList)
+            {
+                sb.AppendIndent(deep);
+                sb.AppendLine($"// {c}");
+            }
+
+            //complex
+            //var commentList = comment.Split('\n');
+            //sb.AppendIndent(deep);
+            //sb.AppendLine($"/// <summary>");
+            //foreach (var c in commentList)
+            //{
+            //    sb.AppendIndent(deep);
+            //   sb.AppendLine($"/// {c}");
+            //}
+            //sb.AppendIndent(deep);
+            //sb.AppendLine($"/// <summary>");
+        }
+
+        private static void AppendIndent(this StringBuilder sb, int deep)
         {
             for (int t = 0; t <= deep; t++)
             {
@@ -132,206 +158,28 @@ namespace Feamber.Data
             }
         }
 
-        //-- Append Property -------------------------------------------------------------------------------------------------------------------------
-        private static void AppendNormalProperty(this StringBuilder sb,string type, string name, int deep)
+        private static string GetGroupType(string type, string value)
         {
-            sb.AppendIndent(deep);
-            sb.AppendLine($"public {type} {name} {{ get; set; }}");
-            sb.AppendLine("");
-        }
+            var item = value.Split(',')[0];
 
-        private static void AppendListProperty(this StringBuilder sb, string type, string name, int deep)
-        {
-
-        }
-
-        private static void AppendClassProperty(this StringBuilder sb, string name, int deep)
-        {
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//-------------------------------------------------------------------------------------------------------------------
-        private static string BuildCommentString( List<TableExcelHeader> headers )
-        {
-            var luaString = new StringBuilder();
-            luaString.Append(
-@"--[[
-item define:
-");
-            luaString.appendFormatLineEx( 1, "{0,-25} {1,-15} {2}", "____name", "____type", "____desc");
-
-            for (int i = 0; i < headers.Count; i++)
+            string t;
+            if (type.Contains("int") || int.TryParse(item, out _))
             {
-                var hdr = headers[i];
-
-                var name = hdr.FieldName;
-                var desc = hdr.FieldDesc;
-                if (hdr.FieldName == "id")
-                {
-                    name = "index";
-                    desc = "唯一数字索引";
-                }
-                else if (hdr.FieldName == "key")
-                {
-                    name = "id";
-                    desc = "唯一字符串索引";
-                }
-                    
-                appendFormatLineEx(luaString, 1, "{0,-25} {1,-15} {2}", name, hdr.FieldType, desc);
+                t = "int";
             }
-            appendFormatLineEx(luaString, 0, "--]]");
-            luaString.AppendLine();
-            luaString.AppendLine();
-
-            var tipsNum = 0;
-
-            for (int i = 0; i < headers.Count; i++)
+            else if (type.Contains("double") || double.TryParse(item, out _))
             {
-                var hdr = headers[i];
-                if (hdr.FieldDetail.Length > 0)
-                {
-                    if (tipsNum == 0)
-                    {
-                        appendFormatLineEx(luaString, 0, "--[[ table tips:");
-                        luaString.AppendLine();
-                    }
-                    tipsNum++;
-                    appendFormatLineEx(luaString, 0, "{0}", hdr.FieldName);
-                    appendFormatLineEx(luaString, 0, "{0,-10}", hdr.FieldDetail);
-                    luaString.AppendLine();
-                }
+                t = "float";
             }
-            if (tipsNum > 0)
+            else if (type.Contains("bool") || bool.TryParse(item, out _))
             {
-                appendFormatLineEx(luaString, 0, "--]]");
-                luaString.AppendLine();
-                luaString.AppendLine();
+                t = "bool";
             }
-            appendFormatLineEx(luaString, 0, "--To consider the programmer's habits,replace the 'id' and 'key' in Excel with 'index' and 'id'");
-            return luaString.ToString();
-        }
-
-
-
-
-        private static string BuildItemString(TableExcelData data)
-        {
-            var ids = new List<string>();
-            var keys = new List<string>();
-            var luaString = new StringBuilder();
-            foreach (var row in data.Rows)
+            else
             {
-                for (int i = 0; i < data.Headers.Count; i++)
-                {
-                    var hdr = data.Headers[i];
-                    var val = row.StrList[i];
-                    string s = string.Empty;
-                    if (hdr.FieldName == "id")
-                    {
-                        int n = 0;
-                        int.TryParse(val, out n);
-                        s = n.ToString();
-                        ids.Add(s);
-                    }
-                    else if (hdr.FieldName == "key")
-                    {
-                        s = string.Format("\"{0}\"", val);
-                        keys.Add(s);
-                    }
-
-                }
+                t = "string";
             }
-
-            appendFormatLineEx(luaString, 0, "local indexItems = ");
-            appendFormatLineEx(luaString, 0, "{{");
-            for (int i = 0; i < ids.Count; i++)
-            {
-                appendFormatLineEx(luaString, 1, "[{0}] = items[{1}],", ids[i], i + 1);
-            }
-            appendFormatLineEx(luaString, 0, "}}");
-            luaString.AppendLine();
-
-            appendFormatLineEx(luaString, 0, "local idItems = ");
-            appendFormatLineEx(luaString, 0, "{{");
-            for (int i = 0; i < keys.Count; i++)
-            {
-                appendFormatLineEx(luaString, 1, "[{0}] = items[{1}],", keys[i], i + 1);
-            }
-            appendFormatLineEx(luaString, 0, "}}");
-            luaString.AppendLine();
-            return luaString.ToString();
-        }
-
-        private static string BuildFuncString( string fileName )
-        {
-            var luaString = new StringBuilder();
-            luaString.Append(
-@"
-local data = { Items = items, IndexItems = indexItems, IdItems = idItems, }
-");
-            luaString.AppendFormat(
-@"
-function data:GetByIndex( index, prop )
-    local item = self.IndexItems[index];
-    if item == nil then
-        sGlobal:Print( ""{0} GetByIndex nil item: ""..index );
-        return index;
-    end
-    if prop == nil then
-        return item;
-    end
-    if item[prop] == nil then
-        sGlobal:Print( ""{0} GetByIndex nil prop: ""..prop );
-        return item;
-    end
-    return item[prop];
-end
-
-function data:GetById( id, prop )
-    local item = self.IdItems[id];
-    if item == nil then
-        sGlobal:Print( ""{0} GetById nil id: ""..id );
-        return id;
-    end
-    if prop == nil then
-        return item;
-    end
-    if item[prop] == nil then
-        sGlobal:Print( ""{0} GetById nil prop: ""..prop );
-        return item;
-    end
-    return item[prop];
-end
-
-function data:GetIdByIndex( index )
-    return data:GetByIndex( index, ""id"" );
-end
-
-function data:GetIndexById( id )
-    return data:GetById( id, ""index"" );
-end
-
-function data:GetCount()
-    return #self.IndexItems;
-end
-
-return data
-", Path.GetFileName(fileName));
-            return luaString.ToString();
+            return t;
         }
     }
 }

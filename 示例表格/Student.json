@@ -1,0 +1,27 @@
+[ {
+    "Index": 1,
+    "Id": "Stud1",
+    "Age": 21,
+    "Name": "XiaoMing",
+    "Weight": 50.3,
+    "Skin": "0xFEAC34",
+    "Language": [ "Eng", "Chs" ],
+    "Number": [ 1, 2, 3, 4 ],
+    "Score": [ 1.1, 4.5, 6.7, 4.6 ],
+    "Parent": {
+      "Name": "Haha"
+    }
+  }, {
+    "Index": 2,
+    "Id": "Stud2",
+    "Age": 23,
+    "Name": "XiaoHua",
+    "Weight": 56.4,
+    "Skin": "0xF66666",
+    "Language": [ "Janp", "AAA" ],
+    "Number": [ 35, 43, 65, 63, 424 ],
+    "Score": [ 1.1, 4.5, 6.7, 4.6 ],
+    "Parent": {
+      "Name": "AKKK"
+    }
+  } ]
