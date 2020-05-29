@@ -23,7 +23,7 @@ namespace tablegen2.logic
             // appendFormatLineEx(csString, 0, "local items =");
             // appendFormatLineEx(csString, 0, "{{");
 
-            csString.Append(BuildDataString(data, string.Empty, 1));
+            csString.Append(BuildDataString(data, string.Empty, 2));
 
             //appendFormatLineEx(csString, 0, "}}");
             //csString.AppendLine();
@@ -88,8 +88,7 @@ namespace Feamber.Data
                     string name = string.Empty;
                     switch (header.FieldType)
                     {
-                    case "string":
-                    case "string(nil)":
+                        case "string":
                             name = header.FieldName;
                             if (header.FieldName.ToLower() == "key")
                             {
@@ -97,8 +96,12 @@ namespace Feamber.Data
                             }
                             csString.AppendNormalProperty("string", name, deep);
                             break;
-                    case "int":
 
+                        case "string(nil)":
+                            csString.AppendNormalProperty("string", header.FieldName, deep);
+                            break;
+
+                        case "int":
                             name = header.FieldName;
                             if (header.FieldName.ToLower() == "id")
                             {
@@ -106,11 +109,14 @@ namespace Feamber.Data
                             }
                             csString.AppendNormalProperty("int", name, deep);
                             break;
+
                         case "double":
                             csString.AppendNormalProperty("double", header.FieldName, deep);
                             break;
+
                         case "bool":
-                        csString.AppendNormalProperty("bool", header.FieldName, deep);
+
+                            csString.AppendNormalProperty("bool", header.FieldName, deep);
                             {
                                // bool.TryParse(value, out bool n);
                               //  s = n == true ? "true" : "false";
