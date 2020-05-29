@@ -74,72 +74,38 @@ namespace Feamber.Data
 
             var csString = new StringBuilder();
 
-                for (int i = 0; i < data.Headers.Count; i++)
+            for (int i = 0; i < data.Headers.Count; i++)
+            {
+                var header = data.Headers[i];
+                //var value = data.Rows[1].StrList[i];
+
+                //if (key != string.Empty && (header.FieldName == "id" || header.FieldName == "key"))
+                //    continue;
+
+                //if (string.IsNullOrEmpty(value) && !(header.FieldType == "group" || header.FieldType == "string" || header.FieldType == "table"))
+                //    continue;
+                string type = header.FieldType;
+                string name = header.FieldName;
+                if (type == "group")
                 {
-                    var header = data.Headers[i];
-                    //var value = data.Rows[1].StrList[i];
+                    //  s = string.Format("{{{0}}}", value);
 
-                    //if (key != string.Empty && (header.FieldName == "id" || header.FieldName == "key"))
-                    //    continue;
-
-                    //if (string.IsNullOrEmpty(value) && !(header.FieldType == "group" || header.FieldType == "string" || header.FieldType == "table"))
-                    //    continue;
-
-                    string name = string.Empty;
-                    switch (header.FieldType)
-                    {
-                        case "string":
-                            name = header.FieldName;
-                            if (header.FieldName.ToLower() == "key")
-                            {
-                                name = "Id";
-                            }
-                            csString.AppendNormalProperty("string", name, deep);
-                            break;
-
-                        case "string(nil)":
-                            csString.AppendNormalProperty("string", header.FieldName, deep);
-                            break;
-
-                        case "int":
-                            name = header.FieldName;
-                            if (header.FieldName.ToLower() == "id")
-                            {
-                                name = "Index";
-                            }
-                            csString.AppendNormalProperty("int", name, deep);
-                            break;
-
-                        case "double":
-                            csString.AppendNormalProperty("double", header.FieldName, deep);
-                            break;
-
-                        case "bool":
-
-                            csString.AppendNormalProperty("bool", header.FieldName, deep);
-                            {
-                               // bool.TryParse(value, out bool n);
-                              //  s = n == true ? "true" : "false";
-                            }
-                            break;
-                        case "group":
-                            {
-                              //  s = string.Format("{{{0}}}", value);
-                            }
-                            break;
-                        case "color":
-                            {
-                             //   s = string.Format("{0:X}", value);
-                            }
-                            break;
-                        case "table":
-                            {
-                            //    s = BuildDataString(data.ChildData[header.FieldName], data.Rows[1].StrList[1], deep + 1);
-                            }
-                            break;
-                    }
                 }
+                else if (type == "table")
+                {
+                    //    s = BuildDataString(data.ChildData[header.FieldName], data.Rows[1].StrList[1], deep + 1);
 
+                }
+                else
+                {
+                    if (name.ToLower() == "id")     { name = "Index"; }
+                    if (name.ToLower() == "key")    { name = "Id"; }
+                    if (type.ToLower() == "string(nil)") { type = "string"; }
+                    if (type.ToLower() == "double") { type = "float"; }
+                    if (type.ToLower() == "color") { type = "string"; }
+                    csString.AppendNormalProperty(type, name, deep);
+                }
+            }
             return csString.ToString();
         }
 
