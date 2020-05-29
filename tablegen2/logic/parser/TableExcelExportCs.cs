@@ -23,7 +23,7 @@ namespace tablegen2.logic
             // appendFormatLineEx(csString, 0, "local items =");
             // appendFormatLineEx(csString, 0, "{{");
 
-            csString.Append(BuildDataString(data, string.Empty, 2));
+            csString.Append(BuildDataString(data, string.Empty, 1));
 
             //appendFormatLineEx(csString, 0, "}}");
             //csString.AppendLine();
