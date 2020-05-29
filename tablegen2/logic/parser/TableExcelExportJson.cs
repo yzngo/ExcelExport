@@ -42,12 +42,8 @@ namespace tablegen2.logic
         {
             List<Dictionary<string, object>> lst = ExportData(data);
 
-            // Dictionary<string, List<Dictionary<string, object>>> temp = new Dictionary<string, List<Dictionary<string, object>>>();
-            // var fileName = Path.GetFileNameWithoutExtension(filePath);
-            // temp[fileName] = lst;
             var indent = AppData.Config.OutputLuaWithIndent ? Formatting.Indented : Formatting.None;
             string output = SerializeWithCustomIndenting(lst);
-            //string output = JsonConvert.SerializeObject(lst, indent);
             File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(output));
         }
 

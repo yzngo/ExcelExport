@@ -16,13 +16,14 @@ namespace tablegen2.logic
         #region export cs class
         private static void exportCS_Impl(TableExcelData data, string filePath)
         {
+            
             var csString = new StringBuilder();
             csString.Append( BuildPrologue() );
             csString.Append( BuildTitle(filePath) );
             // appendFormatLineEx(csString, 0, "local items =");
             // appendFormatLineEx(csString, 0, "{{");
 
-            //csString.Append(BuildDataString(data, string.Empty, 2));
+            csString.Append(BuildDataString(data, string.Empty, 1));
 
             //appendFormatLineEx(csString, 0, "}}");
             //csString.AppendLine();
@@ -39,7 +40,7 @@ namespace tablegen2.logic
                 sb.Append(new String(' ', indent * 4));
             sb.AppendFormat(fmtstr, args);
             sb.AppendLine();
-        }
+        } 
 
 //-- 构造开头 ---------------------------------------------------------------------------------------------------------------------------
         private static string BuildPrologue()
@@ -68,152 +69,70 @@ namespace Feamber.Data
         }
 
 //-- 构造成员 ---------------------------------------------------------------------------------------------------------------------------
-        private static string BuildDataString(TableExcelData data, string key, int iDeep)
+        private static string BuildDataString(TableExcelData data, string key, int deep)
         {
-            bool bWithIndent = AppData.Config.OutputLuaWithIndent;
+
             var csString = new StringBuilder();
-            int lbracket = 0, rbracket = 0; ;
-            foreach (var row in data.Rows)
-            {
-                if (key == string.Empty)
-                {
-                    if (bWithIndent == true)
-                    {
-                        for (int t = 1; t <= iDeep - 1; t++)
-                        {
-                            csString.Append("    ");
-                        }
-                    }
-                    else
-                    {
-                        csString.Append("    ");
-                    }
 
-                }
-                if (key != string.Empty && key != row.StrList[1])
-                    continue;
-
-                if (bWithIndent == true)
-                {
-                    csString.Append("{\n");
-                }
-                else
-                {
-                    csString.Append("{");
-                }
-                lbracket++;
                 for (int i = 0; i < data.Headers.Count; i++)
                 {
-                    var hdr = data.Headers[i];
-                    var val = row.StrList[i];
+                    var header = data.Headers[i];
+                    //var value = data.Rows[1].StrList[i];
 
-                    if (key != string.Empty && (hdr.FieldName == "id" || hdr.FieldName == "key"))
-                        continue;
+                    //if (key != string.Empty && (header.FieldName == "id" || header.FieldName == "key"))
+                    //    continue;
 
-                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "group" || hdr.FieldType == "string" || hdr.FieldType == "table"))
-                        continue;
+                    //if (string.IsNullOrEmpty(value) && !(header.FieldType == "group" || header.FieldType == "string" || header.FieldType == "table"))
+                    //    continue;
 
-                    string s = string.Empty;
-                    switch (hdr.FieldType)
+                    string name = string.Empty;
+                    switch (header.FieldType)
                     {
-                        case "string":
-                            s = string.Format("\"{0}\"", val);
-                            break;
-                        case "string(nil)":
-                            s = string.Format("\"{0}\"", val);
-                            break;
-                        case "int":
+                    case "string":
+                    case "string(nil)":
+                            name = header.FieldName;
+                            if (header.FieldName.ToLower() == "key")
                             {
-                                int.TryParse(val, out int n);
-                                s = n.ToString();
+                                name = "Id";
                             }
+                            csString.AppendNormalProperty("string", name, deep);
+                            break;
+                    case "int":
+
+                            name = header.FieldName;
+                            if (header.FieldName.ToLower() == "id")
+                            {
+                                name = "Index";
+                            }
+                            csString.AppendNormalProperty("int", name, deep);
                             break;
                         case "double":
-                            {
-                                double.TryParse(val, out double n);
-                                s = n.ToString();
-                            }
+                            csString.AppendNormalProperty("double", header.FieldName, deep);
                             break;
                         case "bool":
+                        csString.AppendNormalProperty("bool", header.FieldName, deep);
                             {
-                                bool.TryParse(val, out bool n);
-                                s = n == true ? "true" : "false";
+                               // bool.TryParse(value, out bool n);
+                              //  s = n == true ? "true" : "false";
                             }
                             break;
                         case "group":
                             {
-                                s = string.Format("{{{0}}}", val);
+                              //  s = string.Format("{{{0}}}", value);
                             }
                             break;
                         case "color":
                             {
-                                s = string.Format("{0:X}", val);
+                             //   s = string.Format("{0:X}", value);
                             }
                             break;
                         case "table":
                             {
-                                s = BuildDataString(data.ChildData[hdr.FieldName], row.StrList[1], iDeep + 1);
+                            //    s = BuildDataString(data.ChildData[header.FieldName], data.Rows[1].StrList[1], deep + 1);
                             }
                             break;
                     }
-                    if (!string.IsNullOrEmpty(s))
-                    {
-                        if (bWithIndent == true)
-                        {
-                            for (int t = 1; t <= iDeep; t++)
-                            {
-                                csString.Append("    ");
-                            }
-                        }
-
-                        if (hdr.FieldName == "id")
-                            csString.AppendFormat("{0} = {1},", "index", s);
-                        else if (hdr.FieldName == "key")
-                            csString.AppendFormat("{0} = {1},", "id", s);
-                        else
-                            csString.AppendFormat("{0} = {1},", hdr.FieldName, s);
-
-                        if (bWithIndent == true)
-                        {
-                            csString.Append("\n");
-                        }
-                        else
-                        {
-                            csString.Append(" ");
-                        }
-                    }
                 }
-
-                if (key != string.Empty && bWithIndent == true)
-                {
-                    for (int t = 1; t <= iDeep - 1; t++)
-                    {
-                        csString.Append("    ");
-                    }
-                }
-
-                if (key == string.Empty)
-                {
-                    if (bWithIndent == true)
-                    {
-                        csString.AppendLine("    },\n");
-                    }
-                    else
-                    {
-                        csString.AppendLine("},");
-                    }
-                }
-                else
-                {
-                    csString.Append("}");
-                }
-
-                rbracket++;
-            }
-            if (lbracket != rbracket)
-                Log.Err("key: {2} Bracket mismatch {0} to {1}", lbracket, rbracket, key);
-            //else if (lbracket == 0)
-            //    csString.Append("{}");
 
             return csString.ToString();
         }
@@ -230,6 +149,43 @@ namespace Feamber.Data
 ");
             return end.ToString();
         }
+
+
+
+        public static void AppendIndent(this StringBuilder sb, int deep)
+        {
+            for (int t = 0; t <= deep; t++)
+            {
+                sb.Append("    ");
+            }
+        }
+
+        //-- Append Property -------------------------------------------------------------------------------------------------------------------------
+        private static void AppendNormalProperty(this StringBuilder sb,string type, string name, int deep)
+        {
+            sb.AppendIndent(deep);
+            sb.AppendLine($"public {type} {name} {{ get; set; }}");
+            sb.AppendLine("");
+        }
+
+        private static void AppendListProperty(this StringBuilder sb, string type, string name, int deep)
+        {
+
+        }
+
+        private static void AppendClassProperty(this StringBuilder sb, string name, int deep)
+        {
+
+        }
+
+
+
+
+
+
+
+
+
 
 
 
