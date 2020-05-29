@@ -256,6 +256,10 @@ namespace tablegen2
                         {
                             exportPath = Path.Combine(exportDir, string.Format("{0}.json", Path.GetFileNameWithoutExtension(filePath)));
                             TableExcelExportJson.exportExcelFile(data, exportPath);
+                            string fileName = Path.GetFileNameWithoutExtension(filePath);
+                            fileName = fileName.Substring(0, 1).ToUpper() + fileName.Substring(1);
+                            exportPath = Path.Combine(exportDir, string.Format($"{ fileName }.cs"));
+                            TableExcelExportCs.exportExcelFile(data, exportPath);
                         }
                         break;
                     case TableExportFormat.Xml:

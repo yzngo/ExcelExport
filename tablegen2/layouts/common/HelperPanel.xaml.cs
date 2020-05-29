@@ -13,14 +13,13 @@ namespace tablegen2.layouts
 
   * 复合表说明查看 【复合表demo.xlsx】文档
 
-  * 目前字段类型支持
-        string (字符串)    
-        string(nil) 字符串,留空不导出
-        int (整型)               
-        double (小数)            
-        bool (布尔型)            
-        color (格式 0xFFFFFF)    
-        group (数组类型)
+  * 目前字段类型支持            示例:
+        string (字符串)            [  demo  ]
+        int (整型)                 [  100   ]
+        double (小数)              [ 1.001  ]
+        bool (布尔型)              [ true ] / [ false ]
+        color (格式 0xFFFFFF)      [ 0xFDFFFF ]
+        group (数组类型)           [ 1,2,3,4,5]  /  [ ""a"",""b"",""c"",""d"",""e"" ]
         table (子表类型) 
 
   * 单元格留空时的导出行为定义
