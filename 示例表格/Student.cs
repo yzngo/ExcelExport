@@ -30,13 +30,13 @@ namespace Feamber.Data
         public List<int> Number { get; set; }
 
         // 小数数组
-        public List<double> Score { get; set; }
+        public List<float> Score { get; set; }
 
         // 父母信息
         // 姓名等
         public Type_Parent Parent { get; set; }
 
-        public class Type_Parent
+        public sealed class Type_Parent
         {
             // 姓名
             public string Name { get; set; }

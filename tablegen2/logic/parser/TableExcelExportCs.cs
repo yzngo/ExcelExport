@@ -14,10 +14,10 @@ namespace tablegen2.logic
         {
             var csString = new StringBuilder();
 
-            csString.AppendPrologue();
-            csString.AppendTitle(filePath);
-            csString.AppendProperty(data, string.Empty, 1);
-            csString.AppendEnd();
+           csString.AppendPrologue();
+           csString.AppendTitle(filePath);
+           csString.AppendProperty(data, string.Empty, 1);
+           csString.AppendEnd();
 
             File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(csString.ToString()));
         }
@@ -117,7 +117,7 @@ namespace Feamber.Data
             sb.AppendLine($"public Type_{name} {name} {{ get; set; }}");
             sb.AppendLine();
             sb.AppendIndent(deep);
-            sb.AppendLine($"public class Type_{name}");
+            sb.AppendLine($"public sealed class Type_{name}");
             sb.AppendIndent(deep);
             sb.AppendLine("{");
         }

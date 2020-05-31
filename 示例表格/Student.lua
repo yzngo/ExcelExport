@@ -14,10 +14,11 @@ item define:
     Name                      string          姓名
     Weight                    double          体重
     Skin                      color           肤色
-    Language                  group(string)   会说的语言
-    Number                    group(int)      数字数组
-    Score                     group(double)   小数数组
+    Language                  group           会说的语言
+    Number                    group           数字数组
+    Score                     group           小数数组
     Parent                    table           父母信息
+姓名等
 --]]
 
 

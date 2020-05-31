@@ -21,8 +21,8 @@ namespace tablegen2.logic
 
         public bool checkUnique(out string errmsg)
         {
-            int idx1 = Headers.FindIndex(a => a.FieldName.Equals("id"));
-            int idx2 = Headers.FindIndex(a => a.FieldName.Equals("key"));
+            int idx1 = Headers.FindIndex(a => a.FieldName.ToLower() == "id");
+            int idx2 = Headers.FindIndex(a => a.FieldName.ToLower() == "key");
             var ids = new HashSet<int>();
             var keys = new HashSet<string>();
             for (int i = 0; i < Rows.Count; i++)
