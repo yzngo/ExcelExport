@@ -95,21 +95,30 @@ namespace tablegen2.logic
                                 var str = val.Split(',');
                                 bool succeed = false;
                                 {
-                                    var numlist = new List<double>();
+                                    var numlist = new List<int>();
                                     foreach (var s in str)
                                     {
-                                        succeed = double.TryParse(s, out double n);
+                                        succeed = int.TryParse(s, out int n);
+                                        if (succeed == false)
+                                        {
+                                            break;
+                                        }
                                         numlist.Add(n);
+
                                     }
                                     obj = numlist;
                                 }
 
                                 if (succeed == false)
                                 {
-                                    var numlist = new List<int>();
+                                    var numlist = new List<double>();
                                     foreach (var s in str)
                                     {
-                                        succeed = int.TryParse(s, out int n);
+                                        succeed = double.TryParse(s, out double n);
+                                        if (succeed == false)
+                                        {
+                                            break;
+                                        }
                                         numlist.Add(n);
                                     }
                                     obj = numlist;
@@ -204,6 +213,26 @@ namespace tablegen2.logic
                                     foreach (var s in str)
                                     {
                                         succeed = int.TryParse(s, out int n);
+                                        if (succeed == false)
+                                        {
+                                            break;
+                                        }
+                                        numlist.Add(n);
+
+                                    }
+                                    obj = numlist;
+                                }
+
+                                if (succeed == false)
+                                {
+                                    var numlist = new List<double>();
+                                    foreach (var s in str)
+                                    {
+                                        succeed = double.TryParse(s, out double n);
+                                        if (succeed == false)
+                                        {
+                                            break;
+                                        }
                                         numlist.Add(n);
                                     }
                                     obj = numlist;
