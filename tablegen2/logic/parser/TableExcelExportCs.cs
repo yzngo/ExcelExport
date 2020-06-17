@@ -163,13 +163,13 @@ namespace Feamber.Data
             var item = value.Split(',')[0];
 
             string t;
-            if (type.Contains("int") || int.TryParse(item, out _))
-            {
-                t = "int";
-            }
-            else if (type.Contains("double") || double.TryParse(item, out _))
+            if (type.Contains("double") || double.TryParse(item, out _))
             {
                 t = "float";
+            }
+            else if (type.Contains("int") || int.TryParse(item, out _))
+            {
+                t = "int";
             }
             else if (type.Contains("bool") || bool.TryParse(item, out _))
             {
