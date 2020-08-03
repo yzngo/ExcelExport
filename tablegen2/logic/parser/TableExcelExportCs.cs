@@ -136,18 +136,6 @@ namespace Feamber.Data
                 sb.AppendIndent(deep);
                 sb.AppendLine($"// {c}");
             }
-
-            //complex
-            //var commentList = comment.Split('\n');
-            //sb.AppendIndent(deep);
-            //sb.AppendLine($"/// <summary>");
-            //foreach (var c in commentList)
-            //{
-            //    sb.AppendIndent(deep);
-            //   sb.AppendLine($"/// {c}");
-            //}
-            //sb.AppendIndent(deep);
-            //sb.AppendLine($"/// <summary>");
         }
 
         private static void AppendIndent(this StringBuilder sb, int deep)
@@ -160,18 +148,36 @@ namespace Feamber.Data
 
         private static string GetGroupType(string type, string value)
         {
-            var item = value.Split(',')[0];
+            string item = value.Split(',')[0];
 
             string t;
-            if (type.Contains("int") || int.TryParse(item, out _))
+
+            if (type.Contains("int"))
             {
                 t = "int";
-            }
-            else if (type.Contains("double") || double.TryParse(item, out _))
+            } 
+            else if (type.Contains("double"))
             {
                 t = "float";
             }
-            else if (type.Contains("bool") || bool.TryParse(item, out _))
+            else if (type.Contains("bool"))
+            {
+                t = "bool";
+            }
+            else if (type.Contains("string"))
+            {
+                t = "string";
+            }
+
+            else if (int.TryParse(item, out _))
+            {
+                t = "int";
+            }
+            else if (double.TryParse(item, out _))
+            {
+                t = "float";
+            }
+            else if (bool.TryParse(item, out _))
             {
                 t = "bool";
             }

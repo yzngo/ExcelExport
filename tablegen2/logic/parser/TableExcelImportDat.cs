@@ -6,9 +6,9 @@ namespace tablegen2.logic
 {
     public static class TableExcelImportDat
     {
-        public static TableExcelData importFile(string filePath)
+        public static TableExcelData ImportFile(string filePath)
         {
-            var content = GzipHelper.processGZipDecode(File.ReadAllBytes(filePath));
+            byte[] content = GzipHelper.processGZipDecode(File.ReadAllBytes(filePath));
             var ms = new MemoryStream(content);
             var br = new BinaryReader(ms);
 
@@ -22,8 +22,8 @@ namespace tablegen2.logic
                 if (string.IsNullOrEmpty(fieldName))
                     break;
 
-                var fieldType = string.Empty;
-                var ftype = br.ReadByte();
+                string fieldType;
+                byte ftype = br.ReadByte();
                 switch (ftype)
                 {
                     case 1:
@@ -58,6 +58,9 @@ namespace tablegen2.logic
                         break;
                     case 11:
                         fieldType = "group(bool)";
+                        break;
+                    case 12:
+                        fieldType = "group(string)";
                         break;
                     default:
                         throw new Exception(string.Format("无法识别的字段类型 fieldName:{0} fieldType:{1}", fieldName, ftype));

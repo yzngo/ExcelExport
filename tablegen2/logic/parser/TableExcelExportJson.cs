@@ -60,7 +60,7 @@ namespace tablegen2.logic
                     var hdr = data.Headers[i];
                     var val = row.StrList[i];
 
-                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType.Contains("group") || hdr.FieldType == "string" || hdr.FieldType == "table"))
+                    if (string.IsNullOrEmpty(val) && !(hdr.FieldType == "table"))
                     {
                         continue;
                     }

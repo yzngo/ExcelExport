@@ -143,7 +143,7 @@ namespace tablegen2
         {
             try
             {
-                var data = TableExcelImportDat.importFile(OpenDatFullPath);
+                var data = TableExcelImportDat.ImportFile(OpenDatFullPath);
                 openEditUI(data, OpenDatFullPath);
             }
             catch (System.Exception ex)
