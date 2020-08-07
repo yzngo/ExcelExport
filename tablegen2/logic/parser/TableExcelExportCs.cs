@@ -37,7 +37,9 @@ namespace Feamber.Data
         //-- 构造类名 ---------------------------------------------------------------------------------------------------------------------------
         private static void AppendTitle(this StringBuilder sb, string path)
         {
-            sb.AppendLine($"    public sealed class {Path.GetFileNameWithoutExtension(path)} : IData");
+            sb.AppendLine($"    // 此文件自动生成, 勿修改.");
+            sb.AppendLine($"    // 如需自定义方法, 写在SkillList.Ex.cs");
+            sb.AppendLine($"    public sealed partial class {Path.GetFileNameWithoutExtension(path)} : IBaseData");
             sb.AppendLine("    {");
         }
 

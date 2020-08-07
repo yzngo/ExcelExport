@@ -244,6 +244,7 @@
     <Compile Include="logic\parser\TableExportFormat.cs" />
     <Compile Include="logic\parser\TableExcelHeader.cs" />
     <Compile Include="logic\parser\TableGenConfig.cs" />
+    <Compile Include="logic\parser\TableExcelExportCsEx.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -254,12 +254,23 @@ namespace tablegen2
                         break;
                     case TableExportFormat.Json:
                         {
+                            // export json
                             exportPath = Path.Combine(exportDir, string.Format("{0}.json", Path.GetFileNameWithoutExtension(filePath)));
                             TableExcelExportJson.exportExcelFile(data, exportPath);
+
+                            // export cs
                             string fileName = Path.GetFileNameWithoutExtension(filePath);
                             fileName = fileName.Substring(0, 1).ToUpper() + fileName.Substring(1);
                             exportPath = Path.Combine(exportDir, string.Format($"{ fileName }.cs"));
                             TableExcelExportCs.ExportExcelFile(data, exportPath);
+
+                            // export csEx
+                            exportPath = Path.Combine(exportDir, string.Format($"{ fileName }.Ex.cs"));
+                            if (!File.Exists(exportPath))
+                            {
+                                TableExcelExportCsEx.ExportExcelFile(data, exportPath, fileName);
+                            }
+                            
                         }
                         break;
                     case TableExportFormat.Xml:
