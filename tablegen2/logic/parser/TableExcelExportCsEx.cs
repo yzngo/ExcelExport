@@ -31,6 +31,10 @@ namespace tablegen2.logic
             sb.AppendLine(@"        {");
             sb.AppendLine(@"            Debug.Assert(Index > 0, $""{ nameof(Index)}{ Index} (excel-id) must greater than 0"");");
             sb.AppendLine(@"        }");
+            sb.AppendLine(@"");
+            sb.AppendLine(@"        public void OnInit()");
+            sb.AppendLine(@"        {");
+            sb.AppendLine(@"        }");
             sb.AppendLine(@"    }");
             sb.AppendLine(@"");
             sb.AppendLine(@"    public static partial class DataListExtensioMethods");
