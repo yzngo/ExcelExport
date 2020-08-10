@@ -104,19 +104,19 @@ namespace Feamber.Data
         private static void AppendNormalProperty(this StringBuilder sb, string type, string name, int deep)
         {
             sb.AppendIndent(deep);
-            sb.AppendLine($"public {type} {name} {{ get; set; }}");
+            sb.AppendLine($"public {type} {name} {{ get; private set; }}");
         }
 
         private static void AppendListProperty(this StringBuilder sb, string type, string name, int deep)
         {
             sb.AppendIndent(deep);
-            sb.AppendLine($"public List<{type}> {name} {{ get; set; }}");
+            sb.AppendLine($"public List<{type}> {name} {{ get; private set; }}");
         }
 
         private static void AppendNestedClassTitle(this StringBuilder sb, string name, int deep)
         {
             sb.AppendIndent(deep);
-            sb.AppendLine($"public Type_{name} {name} {{ get; set; }}");
+            sb.AppendLine($"public Type_{name} {name} {{ get; private set; }}");
             sb.AppendLine();
             sb.AppendIndent(deep);
             sb.AppendLine($"public sealed class Type_{name}");
