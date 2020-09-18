@@ -70,7 +70,7 @@ namespace tablegen2.logic
             for(int i = 0; i < Headers.Count; ++i)
             {
                 var hdr = Headers[i];
-                IList<string> field = new List<string>() { "string", "string(nil)", "int", "double", "bool", "color", 
+                IList<string> field = new List<string>() { "string", "string(nil)", "int", "double", "double(64)", "bool", "color", 
                                                                     "group", "table", "group(int)", "group(double)", "group(string)", "group(bool)" };
                 if (!field.Contains<string>(hdr.FieldType))
                 {

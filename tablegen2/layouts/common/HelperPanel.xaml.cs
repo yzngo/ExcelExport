@@ -17,6 +17,7 @@ namespace tablegen2.layouts
         string (字符串)            [  demo  ]
         int (整型)                 [  100   ]
         double (小数)              [ 1.001  ]
+        double(64) 双精度小数
         bool (布尔型)              [ true ] / [ false ]
         color (格式 0xFFFFFF)      [ 0xFDFFFF ]
         group (数组)              [ ""a"",""b"",""c"",""d"",""e"" ]

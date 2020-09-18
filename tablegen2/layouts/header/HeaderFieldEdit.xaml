@@ -26,6 +26,7 @@
             <ComboBoxItem Height="20" Content="string          字符串  [ demo ]" Tag="string" IsSelected="True" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="int             整数           [   1  ]" Tag="int" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="double      小数          [ 0.01 ]" Tag="double" Margin="0,1,0,1"/>
+            <ComboBoxItem Height="20" Content="double(64)      小数          [ 0.01 ]" Tag="double(64)" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="bool        布尔量        [ true ]   [false]" Tag="bool" Margin="0,1,0,1" />
             <ComboBoxItem Height="20" Content="group      字符串数组    [ &quot;a&quot;,&quot;b&quot; ]" Tag="group" Margin="0,1,0,1"/>
             <ComboBoxItem Height="20" Content="group(int)     整数数组      [ 1,2,3  ]" Tag="group(int)" Margin="0,1,0,1"/>

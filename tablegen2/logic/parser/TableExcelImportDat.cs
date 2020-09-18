@@ -62,6 +62,9 @@ namespace tablegen2.logic
                     case 12:
                         fieldType = "group(string)";
                         break;
+                    case 13:
+                        fieldType = "double(64)";
+                        break;
                     default:
                         throw new Exception(string.Format("无法识别的字段类型 fieldName:{0} fieldType:{1}", fieldName, ftype));
                 }

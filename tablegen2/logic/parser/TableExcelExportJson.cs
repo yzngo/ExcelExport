@@ -84,6 +84,12 @@ namespace tablegen2.logic
                                 obj = n;
                             }
                             break;
+                        case "double(64)":
+                            {
+                                double.TryParse(val, out double n);
+                                obj = n;
+                            }
+                            break;
                         case "bool":
                             {
                                 bool.TryParse(val, out bool n);
@@ -193,6 +199,12 @@ namespace tablegen2.logic
                             }
                             break;
                         case "double":
+                            {
+                                double.TryParse(val, out double n);
+                                obj = n;
+                            }
+                            break;
+                        case "double(64)":
                             {
                                 double.TryParse(val, out double n);
                                 obj = n;

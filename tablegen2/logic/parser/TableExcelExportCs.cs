@@ -81,6 +81,7 @@ namespace Feamber.Data
 
                     if (type.ToLower() == "string(nil)") { type = "string"; }
                     if (type.ToLower() == "double") { type = "float"; }
+                    if (type.ToLower() == "double(64)") { type = "double"; }
                     if (type.ToLower() == "color") { type = "string"; }
                     sb.AppendNormalProperty(type, name, deep);
                 }
